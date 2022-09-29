@@ -11,4 +11,9 @@ export const componentStyles = css`
     :host *::after {
         box-sizing: inherit;
     }
+    button {
+        background: none;
+        border: none;
+        cursor: pointer;
+    }
 `;
