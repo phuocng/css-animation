@@ -73,16 +73,16 @@ export class MoreActions extends LitElement {
             /* Size */
             height: 0.5rem;
             width: 0.5rem;
-        
+
             background-color: #fff;
             position: absolute;
         }
-        
+
         .popover__arrow--tl {
             /* Position at the top left corner */
             left: 0.5rem;
             top: 0;
-        
+
             /* Border */
             border-left: 1px solid #d1d5db;
             border-top: 1px solid #d1d5db;
@@ -98,7 +98,7 @@ export class MoreActions extends LitElement {
 
     private _handleClick() {
         this._btnEle.classList.toggle('btn--rotate');
-        this._popoverEle.classList.toggle('popover--shown')
+        this._popoverEle.classList.toggle('popover--shown');
     }
 
     render() {

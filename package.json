@@ -24,7 +24,7 @@
         "build:eleventy": "npx @11ty/eleventy",
         "build:js": "rollup -c rollup.config.js",
         "deploy": "npm run build && netlify deploy --prod --dir=_site",
-        "format": "prettier --write \"**/*.+(json|md|scss)\"",
+        "format": "prettier --write \"**/*.+(json|md|scss|ts)\"",
         "start": "npm run watch:eleventy & npm run watch:sass & npm run watch:js",
         "watch:eleventy": "npx @11ty/eleventy --serve --port=8081",
         "watch:sass": "sass styles/index.scss _site/styles/index.min.css --no-source-map --style compressed --watch",
