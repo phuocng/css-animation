@@ -1,6 +1,6 @@
 {
     "name": "css-animation",
-    "description": "Popular CSS animation showcases. You don't need a CSS animation library for them",
+    "description": "Popular CSS animation showcases without external libraries",
     "author": {
         "name": "Nguyen Huu Phuoc",
         "email": "me@phuoc.ng",
