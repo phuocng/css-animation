@@ -1,0 +1,48 @@
+:root {
+    --showcases-num-columns: 1;
+}
+
+.showcases {
+    display: grid;
+    grid-template-columns: repeat(var(--showcases-num-columns), minmax(0, 1fr));
+    background-color: #fff;
+    border-radius: 0.5rem;
+    box-shadow: 0 0 1.5rem rgb(0 0 0 / 10%);
+}
+
+.showcases__item {
+    border-bottom: 1px solid #d1d5db;
+    border-right: 1px solid #d1d5db;
+    padding: 1rem;
+
+    height: 16rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.showcases__demo {
+    flex: 1;
+}
+
+.showcases__name {
+    color: #2563eb;
+    font-size: 1.5rem;
+    text-align: center;
+    text-decoration: none;
+}
+
+@media (min-width: 640px) {
+    :root {
+        --showcases-num-columns: 2;
+    }
+}
+@media (min-width: 768px) {
+    :root {
+        --showcases-num-columns: 3;
+    }
+}
+@media (min-width: 1024px) {
+    :root {
+        --showcases-num-columns: 4;
+    }
+}
