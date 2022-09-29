@@ -11,10 +11,8 @@ eleventyExcludeFromCollections: true
     </div>
 
     <div class="showcases">
-        <div class="showcases__item">
-            <div class="showcases__demo"><more-actions></more-actions></div>
-            <a class="showcases__name" href="/more-actions/">More actions</a>
-        </div>
+        {% showcase "Expanding search bar" %}
+        {% showcase "More actions" %}
     </div>
 
     {% include "follow.njk" %}
