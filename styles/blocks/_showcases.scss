@@ -21,7 +21,9 @@
 }
 
 .showcases__demo {
+    display: flex;
     flex: 1;
+    justify-content: center;
     margin-bottom: 1rem;
 }
 
