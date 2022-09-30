@@ -5,7 +5,7 @@ title: Toggling sidebar
 
 This animation is often used when we open and close a sidebar. Opening a sidebar slides it from left to right. Closing it makes the sidebar disappear from the container.
 
-{% demo %}<toggling-sidebar></toggling-sidebar>{% enddemo %}
+{% demo "Toggling sidebar" %}
 
 ## Layout
 

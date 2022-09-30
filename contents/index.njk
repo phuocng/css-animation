@@ -11,10 +11,9 @@ eleventyExcludeFromCollections: true
     </div>
 
     <div class="showcases">
-        {% showcase "Clicking overlay" %}
-        {% showcase "Expanding search bar" %}
-        {% showcase "More actions" %}
-        {% showcase "Toggling sidebar" %}
+        {%- for post in collections.sortByTitle -%}
+        {% showcase post.data.title %}
+        {%- endfor -%}
     </div>
 
     {% include "follow.njk" %}

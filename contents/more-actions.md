@@ -5,7 +5,7 @@ title: More actions
 
 The animation is often used when we show additional actions inside a menu or popover.
 
-{% demo %}<more-actions></more-actions>{% enddemo %}
+{% demo "More actions" %}
 
 ## Layout
 

@@ -19,55 +19,21 @@ module.exports = function(eleventyConfig) {
 
     // Shortcodes
 
-    eleventyConfig.addPairedShortcode('demo', function(content) {
+    eleventyConfig.addShortcode('demo', function(name) {
+        const componentTag = `${name.toLowerCase().split(' ').join('-')}`;
         return `<div class="example example--border">
             <div class="example__ribbon example__ribbon--tr">
                 <span class="example__title">Demo</span>
             </div>
-            <div class="example__content example__content--medium">${content}</div>
+            <div class="example__content example__content--medium"><${componentTag}></${componentTag}></div>
        </div>`;
     });
     eleventyConfig.addShortcode('showcase', function(name) {
-        const href = `${name.toLowerCase().split(' ').join('-')}`;
+        const componentTag = `${name.toLowerCase().split(' ').join('-')}`;
         return `<div class="showcases__item">
-            <div class="showcases__demo"><${href}></${href}></div>
-            <a class="showcases__name" href="/${href}/">${name}</a>
+            <div class="showcases__demo"><${componentTag}></${componentTag}></div>
+            <a class="showcases__name" href="/${componentTag}/">${name}</a>
         </div>`;
-    });
-
-    // `size` can be `sm`, `md`, `lg`
-    eleventyConfig.addShortcode('circle', function(size) {
-        const s = size || 'sm';
-        return `<div class="circle circle--${s}"></div>`;
-    });
-    // `direction` can be `hor` or `ver`
-    eleventyConfig.addShortcode('line', function(dir) {
-        const w = randomInteger(1, 4) * 20;
-        return `<div class="line line--${dir} line--${w}"></div>`;
-    });
-    eleventyConfig.addShortcode('lines', function(dir, numLines) {
-        const content = Array(numLines).fill('').map(_ => {
-            const w = randomInteger(1, 4) * 20;
-            return `<div class="line line--${dir} line--${w}"></div>`
-        }).join('');
-        return `<div class="lines">${content}</div>`;
-    });
-
-    // `direction` can be `hor` or `ver`
-    eleventyConfig.addShortcode('rectangle', function(dir, size, width) {
-        const direction = dir || 'hor';
-        const s = size || 'sm';
-        const w = width || randomInteger(2, 4) * 20;
-        return `<div class="rectangle rectangle--${direction} rectangle--${s} rectangle--${w}"></div>`;
-    });
-    eleventyConfig.addShortcode('square', function(size) {
-        const s = size || 'sm';
-        return `<div class="square square--${s}"></div>`;
-    });
-    // `corner` can be one of `t`, `r`, `b`, `l`, `tr`, `br`, `tl`, `bl`
-    eleventyConfig.addShortcode('triangle', function(corner, size) {
-        const s = size || 'sm';
-        return `<div class="triangle triangle--${corner} triangle--${s}"></div>`;
     });
 
     // Get the first `n` elements of a collection.
@@ -87,41 +53,6 @@ module.exports = function(eleventyConfig) {
             .sort(function(a, b) {
                 return a.data.title - b.data.title;
             });
-    });
-
-    eleventyConfig.addCollection('categories', function(collectionApi) {
-        const categories = [];
-        collectionApi.getAll()
-            .filter(function(item) {
-                let extension = item.inputPath.split('.').pop();
-                return extension === 'md';
-            })
-            .forEach((item) => {
-                const category = item.data.category;
-                if (category && !categories.includes(category)) {
-                    categories.push(category);
-                }
-            });
-        return categories.sort();
-    });
-
-    eleventyConfig.addCollection('groupByCategories', function(collectionApi) {
-        const categories = {};
-        collectionApi.getAll()
-            .filter(function(item) {
-                let extension = item.inputPath.split('.').pop();
-                return extension === 'md';
-            })
-            .forEach((item) => {
-                const category = item.data.category;
-                if (!category) {
-                    return;
-                }
-                Array.isArray(categories[category])
-                    ? categories[category].push(item)
-                    : categories[category] = [item];
-            });
-        return categories;
     });
 
     eleventyConfig.addTransform('minify-html', function(content) {

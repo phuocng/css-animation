@@ -6,6 +6,10 @@ import { componentStyles } from './component.styles';
 export class ClickingOverlay extends LitElement {
     static styles = css`
         ${componentStyles}
+        :host {
+            height: 100%;
+            width: 100%;
+        }
         .overlay {
             background: #374151;
             height: 100%;
