@@ -55,6 +55,10 @@
 }
 .example__content {
     padding: 1rem;
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
 }
 .example__content--small {
     height: 20rem;
