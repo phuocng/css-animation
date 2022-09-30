@@ -5,7 +5,7 @@ title: Expanding search bar
 
 We often use this animation to expand a search bar when users click its search icon.
 
-{% demo %}<expanding-search-bar></expanding-search-bar>{% enddemo %}
+{% demo "Expanding search bar" %}
 
 ## Layout
 

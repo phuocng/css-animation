@@ -11,7 +11,7 @@ For example, the modal contains important information that users can lose when i
 
 _Click the overlay to see the effect_
 
-{% demo %}<clicking-overlay></clicking-overlay>{% enddemo %}
+{% demo "Clicking overlay" %}
 
 ## Layout
 
