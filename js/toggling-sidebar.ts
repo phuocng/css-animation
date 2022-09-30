@@ -6,6 +6,10 @@ import { componentStyles } from './component.styles';
 export class TogglingSidebar extends LitElement {
     static styles = css`
         ${componentStyles}
+        :host {
+            height: 100%;
+            width: 100%;
+        }
         .container {
             border: 1px solid #d1d5db;
             height: 100%;
