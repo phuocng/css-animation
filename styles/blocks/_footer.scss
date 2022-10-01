@@ -30,6 +30,16 @@
 .footer__link:hover {
     text-decoration: underline;
 }
+
+.footer__new {
+    background: #6366f1;
+    border-radius: 9999px;
+    color: #fff;
+    font-size: 0.75rem;
+    padding: 0 0.5rem;
+    margin-left: 0.5rem;
+}
+
 .footer__author {
     margin-top: 1rem;
 }
