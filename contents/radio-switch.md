@@ -139,3 +139,7 @@ Setting the `z-index` property fixes the issue:
     z-index: 1;
 }
 ```
+
+## See also
+
+-   [Switching tabs](/switching-tabs/)
