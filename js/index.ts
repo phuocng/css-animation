@@ -5,4 +5,6 @@ export * from './more-actions';
 export * from './radio-switch';
 export * from './switching-dark-mode';
 export * from './switching-options';
+export * from './switching-tabs';
+export * from './tab-border';
 export * from './toggling-sidebar';
