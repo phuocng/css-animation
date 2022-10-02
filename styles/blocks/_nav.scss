@@ -27,6 +27,9 @@
     .nav {
         display: flex;
     }
+    .nav__item {
+        width: 40%;
+    }
     :root {
         --nav__item-margin-bottom: 0;
     }
