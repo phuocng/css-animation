@@ -1,5 +1,7 @@
 export * from './clicking-overlay';
 export * from './expanding-search-bar';
+export * from './flipping-images-horizontally';
+export * from './flipping-images';
 export * from './indeterminate-progress-bar';
 export * from './invalid-input';
 export * from './more-actions';
