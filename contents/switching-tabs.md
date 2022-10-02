@@ -144,7 +144,7 @@ const activateTab = (index) => {
     const buttonRect = button.getBoundingClientRect();
     const containerRect = containerEle.getBoundingClientRect();
 
-    const containerPaddingLeft = parseInt(window.getComputedStyle(this._containerEle).paddingLeft, 10);
+    const containerPaddingLeft = parseInt(window.getComputedStyle(containerEle).paddingLeft, 10);
     const left = buttonRect.left - containerRect.left - containerPaddingLeft;
 
     // Assume `indicatorEle` represents the indicator element
