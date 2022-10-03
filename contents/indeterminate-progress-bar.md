@@ -87,3 +87,7 @@ Finally, run the animation without any delay:
 ```
 
 The `animation-iteration-count: infinite` declaration tells the browser that the animation will loop forever, making the indeterminate effect.
+
+## See also
+
+-   [Loading spinner](/loading-spinner/)

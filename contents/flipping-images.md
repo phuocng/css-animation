@@ -103,7 +103,7 @@ const handleLoad = (e) => {
 
     // Assume `innerEle` represents the inner container
     innerEle.style.width = `${width}px`;
-}
+};
 
 // Assume `containerEle` represents the root element
 containerEle.querySelector('.flipping-images__img').addEventListener('load', handleLoad);
@@ -162,7 +162,7 @@ Until now, the images are flipped within the inner container. The `perspective` 
 }
 ```
 
-It works best if the value of `perspective` is twice as the width of the inner container. We can do that right inside the `load` event handler mentioned in the previous section:
+It works best if the value of `perspective` is twice the width of the inner container. We can do that right inside the `load` event handler mentioned in the previous section:
 
 ```js
 const handleLoad = (e) => {
@@ -173,7 +173,7 @@ const handleLoad = (e) => {
 
     // Assume `containerEle` represents the root element
     containerEle.style.perspective = `${2 * width}px`;
-}
+};
 ```
 
 ## Flipping horizontally
@@ -190,3 +190,5 @@ We use the `rotateY` function to flip the images in the vertical direction. If y
 ```
 
 {% demo "Flipping images horizontally" %}
+
+_Photos by [@tronle_sg](https://unsplash.com/@tronle_sg)_

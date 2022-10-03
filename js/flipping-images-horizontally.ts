@@ -40,7 +40,7 @@ export class FlippingImagesHorizontally extends LitElement {
             position: absolute;
             top: 0;
             left: 0;
-            
+
             backface-visibility: hidden;
         }
         .flipping-images__side--front {
