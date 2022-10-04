@@ -7,6 +7,7 @@ export * from './invalid-input';
 export * from './loading-spinner';
 export * from './more-actions';
 export * from './radio-switch';
+export * from './rotating-words';
 export * from './svg-spinner';
 export * from './switching-dark-mode';
 export * from './switching-options';
