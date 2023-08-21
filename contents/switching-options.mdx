@@ -1,0 +1,368 @@
+---
+created: '2022-09-30'
+title: Switching options
+---
+
+The animation is often used when users switch between two possible options. Switching between light and dark modes is a common usage of this animation.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css index.css
+.switch {
+    cursor: pointer;
+    display: flex;
+
+    /* Rounded border */
+    border-radius: 9999px;
+
+    /* Size */
+    height: 2rem;
+    width: 4rem;
+
+    position: relative;
+}
+
+.switch__input {
+    /* Hide the input */
+    display: none;
+}
+
+.switch__circle {
+    /* Rounded border */
+    border-radius: 9999px;
+
+    /* Size */
+    height: 2rem;
+    width: 2rem;
+
+    /* Absolute position */
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    background-color: #fff;
+    transition: transform 200ms;
+}
+
+/* ON status */
+.switch--on {
+    background-color: #357edd;
+}
+.switch--on .switch__circle {
+    border: 1px solid #357edd;
+    transform: translateX(100%);
+}
+
+/* OFF status */
+.switch--off {
+    background-color: #d1d5db;
+}
+.switch--off .switch__circle {
+    border: 1px solid #d1d5db;
+    transform: translateX(0%);
+}
+```
+
+```html index.html
+<label class="switch switch--off" id="switch">
+    <input type="checkbox" class="switch__input" id="input" />
+    <div class="switch__circle"></div>
+</label>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const switchEle = document.getElementById('switch');
+    const checkboxEle = document.getElementById('input');
+
+    checkboxEle.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        if (isChecked) {
+            switchEle.classList.remove('switch--off');
+            switchEle.classList.add('switch--on');
+        } else {
+            switchEle.classList.remove('switch--on');
+            switchEle.classList.add('switch--off');
+        }
+    });
+});
+```
+</Playground>
+
+## Layout
+
+The layout consists of a checkbox and circle:
+
+```html
+<label class="switch">
+    <input type="checkbox" class="switch__input" />
+    <div class="switch__circle"></div>
+</label>
+```
+
+The checkbox is hidden all the time:
+
+```css
+.switch__input {
+    display: none;
+}
+```
+
+Despite the fact that it is invisible, clicking the main `label` also toggles the checkbox value because the `label` contains only a single checkbox element.
+
+The label has the `relative` position style that can be used to position the circle:
+
+```css
+.switch {
+    cursor: pointer;
+
+    /* Rounded border */
+    border-radius: 9999px;
+
+    /* Size */
+    height: 2rem;
+    width: 4rem;
+
+    position: relative;
+}
+```
+
+The circle is positioned absolutely on the left side by default:
+
+```css
+.switch__circle {
+    /* Rounded border */
+    border-radius: 9999px;
+
+    /* Size */
+    height: 2rem;
+    width: 2rem;
+
+    /* Absolute position */
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    background-color: #fff;
+}
+```
+
+We have two possible states for the whole element:
+
+```css
+/* OFF state */
+.switch--off {
+    background-color: #d1d5db;
+}
+.switch--off .switch__circle {
+    border: 1px solid #d1d5db;
+    transform: translateX(0%);
+}
+
+/* ON state */
+.switch--on {
+    background-color: #357edd;
+}
+.switch--on .switch__circle {
+    border: 1px solid #357edd;
+    transform: translateX(100%);
+}
+```
+
+Depending on the _off_ or _on_ state, the circle is moved to the left or right side of the container by using the `translateX` function.
+
+## Animation
+
+Since the circle uses the `transform` property to indicate its position, it becomes easy for us to apply a transition based on the `transition` property:
+
+```css
+.switch__circle {
+    transition: transform 200ms;
+}
+```
+
+We toggle the _on_ and _off_ state when users click on the checkbox. The simple code below assumes that `checkboxEle` and `switchEle` variables represent the checkbox and the label elements, respectively.
+
+```js
+checkboxEle.addEventListener('change', (e) => {
+    const isChecked = e.target.checked;
+    if (isChecked) {
+        switchEle.classList.remove('switch--off');
+        switchEle.classList.add('switch--on');
+    } else {
+        switchEle.classList.remove('switch--on');
+        switchEle.classList.add('switch--off');
+    }
+});
+```
+
+## Adding icons
+
+We are going to demonstrate how to add icons to the left and right sides. The following example is perfectly suitable for the switching themes use case mentioned at the beginning of this post.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css index.css
+.switch {
+    background-color: #357edd;
+    cursor: pointer;
+    display: flex;
+
+    /* Rounded border */
+    border-radius: 9999px;
+
+    /* Size */
+    height: 2rem;
+    width: 4rem;
+
+    position: relative;
+}
+
+.switch__input {
+    /* Hide the input */
+    display: none;
+}
+
+.switch__circle {
+    /* Rounded border */
+    border: 1px solid #357edd;
+    border-radius: 9999px;
+
+    /* Size */
+    height: 2rem;
+    width: 2rem;
+
+    /* Absolute position */
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    background-color: #fff;
+    transition: transform 200ms;
+
+    z-index: 1;
+}
+
+/* ON status */
+.switch--on .switch__circle {
+    transform: translateX(100%);
+}
+
+/* OFF status */
+.switch--off .switch__circle {
+    transform: translateX(0%);
+}
+
+.switch__theme {
+    height: 1rem;
+    width: 1rem;
+
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.switch__theme--light {
+    fill: #fff;
+    left: 0.5rem;
+}
+.switch__theme--dark {
+    right: 0.5rem;
+}
+```
+
+```html index.html
+<label class="switch switch--off" id="switch">
+    <input type="checkbox" class="switch__input" id="input"} />
+    <div class="switch__circle"></div>
+    <svg viewBox="0 0 512 512" class="switch__theme switch__theme--light">
+        <path
+            d="M256 160c-52.9 0-96 43.1-96 96s43.1 96 96 96 96-43.1 96-96-43.1-96-96-96zm246.4 80.5l-94.7-47.3 33.5-100.4c4.5-13.6-8.4-26.5-21.9-21.9l-100.4 33.5-47.4-94.8c-6.4-12.8-24.6-12.8-31 0l-47.3 94.7L92.7 70.8c-13.6-4.5-26.5 8.4-21.9 21.9l33.5 100.4-94.7 47.4c-12.8 6.4-12.8 24.6 0 31l94.7 47.3-33.5 100.5c-4.5 13.6 8.4 26.5 21.9 21.9l100.4-33.5 47.3 94.7c6.4 12.8 24.6 12.8 31 0l47.3-94.7 100.4 33.5c13.6 4.5 26.5-8.4 21.9-21.9l-33.5-100.4 94.7-47.3c13-6.5 13-24.7.2-31.1zm-155.9 106c-49.9 49.9-131.1 49.9-181 0-49.9-49.9-49.9-131.1 0-181 49.9-49.9 131.1-49.9 181 0 49.9 49.9 49.9 131.1 0 181z"
+        ></path>
+    </svg>
+    <svg viewBox="0 0 512 512" class="switch__theme switch__theme--dark">
+        <path
+            d="M283.211 512c78.962 0 151.079-35.925 198.857-94.792 7.068-8.708-.639-21.43-11.562-19.35-124.203 23.654-238.262-71.576-238.262-196.954 0-72.222 38.662-138.635 101.498-174.394 9.686-5.512 7.25-20.197-3.756-22.23A258.156 258.156 0 0 0 283.211 0c-141.309 0-256 114.511-256 256 0 141.309 114.511 256 256 256z"
+        ></path>
+    </svg>
+</label>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const switchEle = document.getElementById('switch');
+    const checkboxEle = document.getElementById('input');
+
+    checkboxEle.addEventListener('change', (e) => {
+        const isChecked = e.target.checked;
+        if (isChecked) {
+            switchEle.classList.remove('switch--off');
+            switchEle.classList.add('switch--on');
+        } else {
+            switchEle.classList.remove('switch--on');
+            switchEle.classList.add('switch--off');
+        }
+    });
+});
+```
+</Playground>
+
+In addition to the checkbox and circle, there are two SVG icons:
+
+```html
+<label class="switch switch--off">
+    <input type="checkbox" />
+    <div class="switch__circle"></div>
+    <svg class="switch__theme switch__theme--light">...</svg>
+    <svg class="switch__theme switch__theme--dark">...</svg>
+</label>
+```
+
+Both icons are positioned absolutely to the main label and displayed at the center vertically:
+
+```css
+.switch__theme {
+    /* Size */
+    height: 1rem;
+    width: 1rem;
+
+    /* Absolute position */
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+}
+```
+
+> Take a look at the [Fixed at side](https://phuoc.ng/collection/css-layout/fixed-at-side) pattern to see how we can build similar layouts
+
+Locating the light or dark icons are easy via the `left` and `right` property:
+
+```css
+.switch__theme--light {
+    left: 0.5rem;
+}
+.switch__theme--dark {
+    right: 0.5rem;
+}
+```
+
+Last but not least, we need to display the circle on top of the icons. Therefore, the circle should have a bigger `z-index` value than the icons:
+
+```css
+.switch__circle {
+    z-index: 1;
+}
+```

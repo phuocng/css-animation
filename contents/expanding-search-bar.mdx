@@ -1,0 +1,174 @@
+---
+created: '2022-09-29'
+title: Expanding search bar
+---
+
+We often use this animation to expand a search bar when users click its search icon.
+
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.search {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    border: 1px solid #d1d5db;
+    border-radius: 9999px;
+    padding: 1rem;
+
+    width: max-content;
+}
+.search--expanded .search__input {
+    width: 10rem;
+}
+
+.search__input {
+    /* Reset */
+    border: none;
+    padding: 0;
+
+    width: 0;
+    transition: width 120ms;
+}
+.search__input:focus {
+    outline: none;
+}
+.search__button {
+    /* Reset */
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.search__icon {
+    fill: none;
+    stroke: #d1d5db;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-width: 1;
+
+    height: 1.5rem;
+    width: 1.5rem;
+}
+```
+
+```html index.html
+<div class="search" id="search">
+    <input type="text" class="search__input" id="searchInput" placeholder="Search" />
+    <button class="search__button" id="searchButton">
+        <svg class="search__icon" focusable="false" viewBox="0 0 24 24">
+            <path d="M10.5,0.5c5.523,0,10,4.477,10,10s-4.477,10-10,10s-10-4.477-10-10S4.977,0.5,10.5,0.5z M23.5,23.5 l-5.929-5.929"></path>
+        </svg
+    </button>
+</div>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const searchEle = document.getElementById('search');
+    const inputEle = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+
+    searchButton.addEventListener('click', (e) => {
+        const isExpanded = searchEle.classList.contains('search--expanded');
+        if (!isExpanded) {
+            inputEle.focus();
+        }
+
+        searchEle.classList.toggle('search--expanded');
+    });
+});
+```
+</Playground>
+
+## Layout
+
+Let's take a look at the layout of the search box that consists of text input and a search button.
+
+```html
+<div class="search">
+    <!-- The input element -->
+    <input type="text" class="search__input" placeholder="Search" />
+
+    <!-- The search button -->
+    <button class="search__button">
+        <svg class="search__icon">...</svg>
+    </button>
+</div>
+```
+
+These elements are displayed at the [center](https://phuoc.ng/collection/css-layout/centering) in both vertical and horizontal directions, hence we can use the `flexbox` style for the search bar:
+
+```css
+.search {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+The same styles are applied to the button to center the search icon:
+
+```css
+.search__button {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+## Animation
+
+Initially, we can set a zero width for the text input to make it hidden:
+
+```css
+.search__input {
+    width: 0;
+}
+```
+
+In order to animate the input when it is expanded, we simply add a transition for the `width` property:
+
+```css
+.search__input {
+    transition: width 120ms;
+}
+
+.search--expanded .search__input {
+    width: 10rem;
+}
+```
+
+When users click the search button, we will toggle the expanded class for the whole search bar. The following piece of code assumes that the `searchButton` and `searchBar` variables represent the search button and search bar elements, respectively.
+
+```js
+searchButton.addEventListener('click', () => {
+    searchBar.classList.toggle('search--expanded');
+});
+```
+
+To improve the user experience, you should focus on the input automatically:
+
+```js
+searchButton.addEventListener('click', () => {
+    const isExpanded = searchBar.classList.contains('search--expanded');
+    if (!isExpanded) {
+        inputEle.focus();
+    }
+
+    ...
+});
+```

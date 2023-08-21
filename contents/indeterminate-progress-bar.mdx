@@ -1,11 +1,67 @@
 ---
-layout: layouts/post.njk
+created: '2022-10-02'
 title: Indeterminate progress bar
 ---
 
-It is a variant of a [progress bar](https://csslayout.io/progress-bar/). It is often used to inform users that a particular task is being processed but it's not possible to know when it will complete.
+It is a variant of a [progress bar](https://phuoc.ng/collection/css-layout/progress-bar). It is often used to inform users that a particular task is being processed but it's not possible to know when it will complete.
 
-{% demo "Indeterminate progress bar" %}
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.progress-bar {
+    /* Color */
+    background-color: #d1d5db;
+
+    /* Rounded border */
+    border-radius: 9999px;
+
+    width: 12rem;
+    height: 0.75rem;
+
+    position: relative;
+    overflow: hidden;
+}
+
+.progress-bar__progress {
+    /* Color */
+    background-color: #3b82f6;
+
+    /* Rounded border */
+    border-radius: 9999px;
+
+    position: absolute;
+    bottom: 0;
+    top: 0;
+    width: 50%;
+
+    animation-duration: 2s;
+    animation-iteration-count: infinite;
+    animation-name: indeterminate;
+}
+
+@keyframes indeterminate {
+    from {
+        left: -50%;
+    }
+    to {
+        left: 100%;
+    }
+}
+```
+
+```html index.html
+<div class="progress-bar">
+    <div class="progress-bar__progress"></div>
+</div>
+```
+</Playground>
 
 ## Layout
 
@@ -90,4 +146,4 @@ The `animation-iteration-count: infinite` declaration tells the browser that the
 
 ## See also
 
--   [Loading spinner](/loading-spinner/)
+-   [Loading spinner](https://phuoc.ng/collection/css-animation/loading-spinner)

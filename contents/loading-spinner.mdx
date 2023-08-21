@@ -1,11 +1,45 @@
 ---
-layout: layouts/post.njk
+created: '2022-10-03'
 title: Loading spinner
 ---
 
 Spinner lets users know that a particular task is being processed.
 
-{% demo "Loading spinner" %}
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.loading-spinner {
+    height: 4rem;
+    width: 4rem;
+
+    border: 4px solid #d1d5db;
+    border-top-color: #3b82f6;
+    border-radius: 50%;
+
+    animation: spinner 800ms linear infinite;
+}
+
+@keyframes spinner {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+```
+
+```html index.html
+<div class="loading-spinner"></div>
+```
+</Playground>
 
 ## Layout
 
@@ -134,8 +168,79 @@ The following table describes the variable used in the formulation:
 | `strokeWidth` | The border of circles (4) |
 | `size`        | The spinner size (64)     |
 
-{% demo "Svg spinner" %}
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.svg-spinner {
+    animation: spinner 800ms linear infinite;
+}
+.svg-spinner__track {
+    fill-opacity: 0;
+    stroke: #d1d5db;
+    stroke-linecap: round;
+}
+.svg-spinner__progress {
+    fill-opacity: 0;
+    stroke: #3b82f6;
+    stroke-linecap: round;
+}
+
+@keyframes spinner {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+@keyframes spinner {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+```
+
+```html index.html
+<svg
+    class="svg-spinner"
+    width="64px"
+    height="64px"
+    viewBox="-2 -2 68 68"
+>
+    <!-- The track circle -->
+    <circle
+        class="svg-spinner__track"
+        stroke-width="4px"
+        cx="32"
+        cy="32"
+        r="32"
+    ></circle>
+
+    <!-- The progress circle -->
+    <circle
+        class="svg-spinner__progress"
+        stroke-width="4px"
+        cx="32"
+        cy="32"
+        r="32"
+        stroke-dasharray="201.06192982974676"
+        stroke-dashoffset="150.79644737231007"
+    ></circle>
+</svg>
+```
+</Playground>
 
 ## See also
 
--   [Indeterminate progress bar](/indeterminate-progress-bar/)
+-   [Indeterminate progress bar](https://phuoc.ng/collection/css-animation/indeterminate-progress-bar)

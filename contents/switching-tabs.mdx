@@ -1,11 +1,91 @@
 ---
-layout: layouts/post.njk
+created: '2022-10-01'
 title: Switching tabs
 ---
 
-[Tab](https://csslayout.io/tab/) is a popular pattern to group content by different titles. When users switch between tabs, we animate the bottom line to indicate the selected tab.
+[Tab](https://phuoc.ng/collection/css-layout/tab) is a popular pattern to group content by different titles. When users switch between tabs, we animate the bottom line to indicate the selected tab.
 
-{% demo "Switching tabs" %}
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css index.css
+.tabs__titles {
+    align-items: center;
+    display: flex;
+}
+
+.tabs__title {
+    /* Reset */
+    border: transparent;
+    background: transparent;
+    cursor: pointer;
+
+    padding: 0 1rem;
+    height: 2rem;
+}
+
+.tabs__line {
+    background: #d1d5db;
+    height: 2px;
+    width: 100%;
+    position: relative;
+}
+
+.tabs__indicator {
+    background: #3b82f6;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    transition-duration: 200ms;
+    transition-property: transform, width;
+}
+```
+
+```html index.html
+<div class="tabs" id="container">
+    <div class="tabs__titles">
+        <button class="tabs__title">Day</button>
+        <button class="tabs__title">Week</button>
+        <button class="tabs__title">Month</button>
+    </div>
+    <div class="tabs__line">
+        <div class="tabs__indicator" id="selectedIndicator"></div>
+    </div>
+</div>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const containerEle = document.getElementById('container');
+    const indicatorEle = document.getElementById('selectedIndicator');
+    const buttons = containerEle.querySelectorAll('.tabs__title');
+
+    const activateTab = (index) => {
+        const button = buttons[index];
+        const buttonRect = button.getBoundingClientRect();
+
+        const containerRect = containerEle.getBoundingClientRect();
+        const containerPaddingLeft = window.getComputedStyle(containerEle).paddingLeft;
+        const left = buttonRect.left - containerRect.left - parseInt(containerPaddingLeft, 10);
+
+        indicatorEle.style.width = `${buttonRect.width}px`;
+        indicatorEle.style.transform = `translateX(${left}px)`;
+    };
+
+    [...buttons].forEach((button, index) => {
+        button.addEventListener('click', () => {
+            activateTab(index);
+        });
+    });
+});
+```
+</Playground>
 
 ## The first approach
 
@@ -76,7 +156,48 @@ The sample code below uses a CSS variable to represent the value:
 
 More important, since each tab has its own border, it's not easy to animate the selected border moving around when users choose a tab.
 
-{% demo "Tab border" %}
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css index.css
+.tabs__titles {
+    align-items: center;
+    display: flex;
+    border-bottom: 2px solid #d1d5db;
+}
+
+.tabs__title {
+    /* Reset */
+    border: transparent;
+    background: transparent;
+    cursor: pointer;
+
+    padding: 0 1rem;
+    height: 2rem;
+    margin-bottom: -2px;
+}
+
+.tabs__title--selected {
+    border-bottom: 2px solid #3b82f6;
+}
+```
+
+```html index.html
+<div class="tabs">
+    <div class="tabs__titles">
+        <button class="tabs__title">Day</button>
+        <button class="tabs__title tabs__title--selected">Week</button>
+        <button class="tabs__title">Month</button>
+    </div>
+</div>
+```
+</Playground>
 
 ## The second approach
 
@@ -184,4 +305,4 @@ Animating the indicator becomes an easy task by transitioning both `width` and `
 
 ## See also
 
--   [Radio switch](/radio-switch/)
+-   [Radio switch](https://phuoc.ng/collection/css-animation/radio-switch)
