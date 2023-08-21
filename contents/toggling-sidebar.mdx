@@ -1,11 +1,152 @@
 ---
-layout: layouts/post.njk
+created: '2022-09-29'
 title: Toggling sidebar
 ---
 
 This animation is often used when we open and close a sidebar. Opening a sidebar slides it from left to right. Closing it makes the sidebar disappear from the container.
 
-{% demo "Toggling sidebar" %}
+<Playground>
+```css demo.css hidden
+body {
+    height: 24rem;
+}
+```
+
+```css index.css
+.container {
+    border: 1px solid #d1d5db;
+    height: 100%;
+    width: 100%;
+
+    display: flex;
+}
+.sidebar {
+    position: relative;
+    width: 30%;
+    height: 100%;
+    border-right: 1px solid #d1d5db;
+    box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+.sidebar--collapsed {
+    border-right-color: transparent;
+    width: 0;
+}
+.content {
+    flex: 1;
+}
+
+.sidebar__content {
+    background: #d1d5db;
+
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+}
+.sidebar--collapsed .sidebar__content {
+    display: none;
+}
+.sidebar__toggle {
+    /* Reset */
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(100%, 0);
+
+    height: 2rem;
+    width: 2rem;
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+.sidebar__toggle svg {
+    fill: none;
+    stroke: #374151;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.slide-in {
+    animation-duration: 400ms;
+    animation-name: slide-in;
+}
+.slide-out {
+    animation-duration: 400ms;
+    animation-name: slide-out;
+}
+
+@keyframes slide-in {
+    0% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+    100% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+}
+@keyframes slide-out {
+    0% {
+        transform: translateX(0%);
+        opacity: 1;
+    }
+    100% {
+        transform: translateX(-100%);
+        opacity: 0;
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar__content"></div>
+        <button class="sidebar__toggle" id="toggle">
+            <svg viewBox="0 0 24 24">
+                <line x1="21" y1="7" x2="3" y2="7"></line>
+                <line x1="21" y1="12" x2="3" y2="12"></line>
+                <line x1="21" y1="17" x2="3" y2="17"></line>
+            </svg>
+        </button>
+    </div>
+    <div class="content"></div>
+</div>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebarEle = document.getElementById('sidebar');
+    const toggleEle = document.getElementById('toggle');
+    let isExpanded = true;
+
+    sidebarEle.addEventListener('animationend', (e) => {
+        if (e.target === sidebarEle) {
+            sidebarEle.classList.remove('slide-in');
+            sidebarEle.classList.remove('slide-out');
+            if (!isExpanded) {
+                sidebarEle.classList.add('sidebar--collapsed');
+            }
+        }
+    });
+
+    toggleEle.addEventListener('click', (e) => {
+        if (isExpanded) {
+            sidebarEle.classList.remove('slide-in');
+            sidebarEle.classList.add('slide-out');
+        } else {
+            sidebarEle.classList.remove('sidebar--collapsed');
+            sidebarEle.classList.remove('slide-out');
+            sidebarEle.classList.add('slide-in');
+        }
+        isExpanded = !isExpanded;
+    });
+});
+```
+</Playground>
 
 ## Layout
 
@@ -111,17 +252,17 @@ I use the same name, `slide-out` for example, for both the CSS class and corresp
 Inside the handler of the toggle button's `click` event, we will toggle the animation classes depending on whether the sidebar is expanded or not.
 
 ```js
-let _isExpanded = true;
+let isExpanded = true;
 
 const handleToggle = () => {
-    if (_isExpanded) {
+    if (isExpanded) {
         sidebarEle.classList.remove('slide-in');
         sidebarEle.classList.add('slide-out');
     } else {
         sidebarEle.classList.remove('slide-out');
         sidebarEle.classList.add('slide-in');
     }
-    _isExpanded = !_isExpanded;
+    isExpanded = !isExpanded;
 };
 
 toggleButtonEle.addEventListener('click', () => {
@@ -129,13 +270,13 @@ toggleButtonEle.addEventListener('click', () => {
 });
 ```
 
-The sample code above is easy to understand as long as we represent the toggle button and the sidebar element by the `toggleButtonEle` and `sidebarEle` variables. We also need the `_isExpanded` flag to track the sidebar expanded status.
+The sample code above is easy to understand as long as we represent the toggle button and the sidebar element by the `toggleButtonEle` and `sidebarEle` variables. We also need the `isExpanded` flag to track the sidebar expanded status.
 
-By default, the `_isExpanded` flag sets to `true`. Here are the steps when users click the toggle button for the first time:
+By default, the `isExpanded` flag sets to `true`. Here are the steps when users click the toggle button for the first time:
 
 1. The sidebar element removes the `slide-out` class
 2. The sidebar element adds the `slide-in` class making the animation happens
-3. Reverse the `_isExpanded` flag
+3. Reverse the `isExpanded` flag
 
 As the result, the sidebar is really animated. However, it doesn't disappear from the container. Actually, it flies back to the original shape after the animation finishes.
 
@@ -146,7 +287,7 @@ sidebarEle.addEventListener('animationend', (e) => {
     if (e.target === sidebarEle) {
         sidebarEle.classList.remove('slide-in');
         sidebarEle.classList.remove('slide-out');
-        if (!_isExpanded) {
+        if (!isExpanded) {
             sidebarEle.classList.add('sidebar--collapsed');
         }
     }
@@ -155,7 +296,7 @@ sidebarEle.addEventListener('animationend', (e) => {
 
 The `animationend` event triggers when any child of a particular element animates completely. Hence you can see the check `e.target === sidebarEle` to ensure that we're handling the animation event of the sidebar, not its children.
 
-Depending on the `_isExpanded` flag, the sidebar will append the collapsed variant whose width is zero:
+Depending on the `isExpanded` flag, the sidebar will append the collapsed variant whose width is zero:
 
 ```css
 .sidebar--collapsed {

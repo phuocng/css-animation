@@ -1,11 +1,102 @@
 ---
-layout: layouts/post.njk
+created: '2022-10-01'
 title: Radio switch
 ---
 
 We often see this animation when users choose an option from a given list. The following example is a popular usage that has been seen in most pricing tables.
 
-{% demo "Radio switch" %}
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css index.css
+.radio-switch {
+    background: #d1d5db;
+    border-radius: 9999px;
+    display: flex;
+    padding: 0.25rem;
+
+    position: relative;
+}
+
+.radio-switch__label {
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    z-index: 1;
+}
+
+.radio-switch__label--selected {
+    color: #fff;
+}
+
+.radio-switch__input {
+    display: none;
+}
+
+.radio-switch__selected {
+    background: #3b82f6;
+    border-radius: 9999px;
+    position: absolute;
+    top: 0.25rem;
+    bottom: 0.25rem;
+    transition-duration: 200ms;
+    transition-property: transform, width;
+}
+```
+
+```html index.html
+<div class="radio-switch" id="container">
+    <label class="radio-switch__label">
+        <input type="radio" class="radio-switch__input" />
+        Monthly
+    </label>
+    <label class="radio-switch__label">
+        <input type="radio" class="radio-switch__input" />
+        Yearly
+    </label>
+    <div class="radio-switch__selected" id="selectedIndicator"></div>
+</div>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const containerEle = document.getElementById('container');
+    const selectedEle = document.getElementById('selectedIndicator');
+
+    const handleSelectRadio = (e) => {
+        // Query the parent `label` element
+        const label = e.target.parentElement;
+
+        // Calculate the bounding rectangles of the label and root elements
+        const labelRect = label.getBoundingClientRect();
+        const containerRect = containerEle.getBoundingClientRect();
+
+        const containerPaddingLeft = parseInt(window.getComputedStyle(containerEle).paddingLeft, 10);
+        const left = labelRect.left - containerRect.left - containerPaddingLeft;
+
+        selectedEle.style.width = `${label.clientWidth}px`;
+        selectedEle.style.transform = `translateX(${left}px)`;
+
+        const selectedLabel = containerEle.querySelector('.radio-switch__label--selected');
+        if (selectedLabel) {
+            selectedLabel.classList.remove('radio-switch__label--selected');
+        }
+        label.classList.add('radio-switch__label--selected');
+    };
+
+    [...containerEle.querySelectorAll('.radio-switch__input')].forEach((radioEle, index) => {
+        radioEle.addEventListener('click', (e) => {
+            handleSelectRadio(e);
+        });
+    });
+});
+```
+</Playground>
 
 ## Layout
 
@@ -90,15 +181,15 @@ Let's start with handling the `click` event of the radio element, assuming that 
 ```js
 [...containerEle.querySelectorAll('.radio-switch__input')].forEach((radioEle, index) => {
     radioEle.addEventListener('click', (e) => {
-        handleSelectRadio(index, radioEle);
+        handleSelectRadio(e);
     });
 });
 ```
 
-The `handleClickRadio` function handles the `click` event of a particular radio corresponding to the `index` number:
+The `handleSelectRadio` function handles the `click` event of a particular radio corresponding to the `index` number:
 
 ```js
-const handleClickRadio = (index: number, e: MouseEvent) => {
+const handleSelectRadio = (e: MouseEvent) => {
     // Query the parent `label` element
     const label = (e.target as HTMLElement).parentElement;
 
@@ -142,4 +233,4 @@ Setting the `z-index` property fixes the issue:
 
 ## See also
 
--   [Switching tabs](/switching-tabs/)
+-   [Switching tabs](https://phuoc.ng/collection/css-animation/switching-tabs)

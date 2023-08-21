@@ -1,13 +1,114 @@
 ---
-layout: layouts/post.njk
+created: '2022-10-03'
 title: Flipping images
 ---
 
 Flipping images is a common way to compare two different images visually. Clicking one of them will flip it, and shows the other image.
 
-{% demo "Flipping images" %}
-
 _Photos by [@tronle_sg](https://unsplash.com/@tronle_sg)_
+
+<Playground>
+```css demo.css hidden
+body {
+    height: 24rem;
+}
+```
+
+```css styles.css
+.flipping-images {
+    height: 100%;
+    width: 100%;
+
+    cursor: pointer;
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.flipping-images__inner {
+    height: 100%;
+    width: 100%;
+    position: relative;
+
+    transition: transform 800ms;
+    transform-style: preserve-3d;
+}
+.flipping-images__inner--flip {
+    transform: rotateY(180deg);
+}
+
+.flipping-images__side {
+    height: 100%;
+    width: 100%;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    backface-visibility: hidden;
+}
+.flipping-images__side--front {
+    z-index: 2;
+}
+.flipping-images__side--back {
+    transform: rotateY(-180deg);
+    z-index: 1;
+}
+
+.flipping-images__img {
+    height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.flipping-images__help {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+
+    background: #000;
+    border-radius: 0.25rem;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+}
+```
+
+```html index.html
+<div class="flipping-images" id="container">
+    <div class="flipping-images__inner" id="inner">
+        <div class="flipping-images__side flipping-images__side--front">
+            <img class="flipping-images__img" src="/assets/css-animation/city-day.jpg" id="frontImage" />
+            <div class="flipping-images__help">Click to flip</div>
+        </div>
+        <div class="flipping-images__side flipping-images__side--back">
+            <img class="flipping-images__img" src="/assets/css-animation/city-night.jpg" />
+            <div class="flipping-images__help">Click to flip</div>
+        </div>
+    </div>
+</div>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const containerEle = document.getElementById('container');
+    const innerEle = document.getElementById('inner');
+    const frontImage = document.getElementById('frontImage');
+
+    innerEle.addEventListener('click', () => {
+        innerEle.classList.toggle('flipping-images__inner--flip');
+    });
+
+    frontImage.addEventListener('load', (e) => {
+        const imageEle = e.target;
+        const width = imageEle.getBoundingClientRect().width;
+        containerEle.style.perspective = `${2 * width}px`;
+
+        innerEle.style.width = `${width}px`;
+    });
+});
+```
+</Playground>
 
 ## Layout
 
@@ -81,7 +182,7 @@ The images must fit within its side. Without setting the width and height proper
 
 ## Centering the inner
 
-We would like to display the inner container at the [center](https://csslayout.io/centering/) of the root element. Using a combination of three CSS flexbox properties will give us the ability to do that:
+We would like to display the inner container at the [center](https://phuoc.ng/collection/css-layout/centering) of the root element. Using a combination of three CSS flexbox properties will give us the ability to do that:
 
 ```css
 .flipping-images {
@@ -189,6 +290,107 @@ We use the `rotateY` function to flip the images in the vertical direction. If y
 }
 ```
 
-{% demo "Flipping images horizontally" %}
-
 _Photos by [@tronle_sg](https://unsplash.com/@tronle_sg)_
+
+<Playground>
+```css demo.css hidden
+body {
+    height: 24rem;
+}
+```
+
+```css styles.css
+.flipping-images {
+    height: 100%;
+    width: 100%;
+
+    cursor: pointer;
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+.flipping-images__inner {
+    height: 100%;
+    width: 100%;
+    position: relative;
+
+    transition: transform 800ms;
+    transform-style: preserve-3d;
+}
+.flipping-images__inner--flip {
+    transform: rotateX(180deg);
+}
+
+.flipping-images__side {
+    height: 100%;
+    width: 100%;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    backface-visibility: hidden;
+}
+.flipping-images__side--front {
+    z-index: 2;
+}
+.flipping-images__side--back {
+    transform: rotateX(-180deg);
+    z-index: 1;
+}
+
+.flipping-images__img {
+    height: 100%;
+    max-width: 100%;
+    object-fit: cover;
+}
+
+.flipping-images__help {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+
+    background: #000;
+    border-radius: 0.25rem;
+    color: #fff;
+    padding: 0.25rem 0.5rem;
+}
+```
+
+```html index.html
+<div class="flipping-images" id="container">
+    <div class="flipping-images__inner" id="inner">
+        <div class="flipping-images__side flipping-images__side--front">
+            <img class="flipping-images__img" src="/assets/css-animation/city-day.jpg" id="frontImage" />
+            <div class="flipping-images__help">Click to flip</div>
+        </div>
+        <div class="flipping-images__side flipping-images__side--back">
+            <img class="flipping-images__img" src="/assets/css-animation/city-night.jpg" />
+            <div class="flipping-images__help">Click to flip</div>
+        </div>
+    </div>
+</div>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const containerEle = document.getElementById('container');
+    const innerEle = document.getElementById('inner');
+    const frontImage = document.getElementById('frontImage');
+
+    innerEle.addEventListener('click', () => {
+        innerEle.classList.toggle('flipping-images__inner--flip');
+    });
+
+    frontImage.addEventListener('load', (e) => {
+        const imageEle = e.target;
+        const width = imageEle.getBoundingClientRect().width;
+        containerEle.style.perspective = `${2 * width}px`;
+
+        innerEle.style.width = `${width}px`;
+    });
+});
+```
+</Playground>

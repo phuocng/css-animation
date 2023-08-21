@@ -1,5 +1,5 @@
 ---
-layout: layouts/post.njk
+created: '2022-09-30'
 title: Invalid input
 ---
 
@@ -7,7 +7,74 @@ The animation is often used to indicate an invalid input. It shakes the input fo
 
 _Press the Enter key to see the effect_
 
-{% demo "Invalid input" %}
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.input {
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+    height: 2rem;
+    width: 12rem;
+    padding: 0 0.5rem;
+}
+.input--invalid {
+    animation: shake 1s;
+    outline-color: #ef4444;
+}
+
+@keyframes shake {
+    from,
+    to {
+        transform: translateX(0);
+    }
+
+    40%,
+    80% {
+        transform: translateX(-1rem);
+    }
+
+    20%,
+    60% {
+        transform: translateX(1rem);
+    }
+}
+```
+
+```html index.html
+<input
+    class="input"
+    type="text"
+    name="email"
+    placeholder="Enter email address"
+    id="input"
+/>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const inputEle = document.getElementById('input');
+
+    inputEle.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            inputEle.classList.add('input--invalid');
+        }
+    });
+
+    inputEle.addEventListener('animationend', (e) => {
+        if (e.animationName === 'shake') {
+            inputEle.classList.remove('input--invalid');
+        }
+    });
+});
+```
+</Playground>
 
 The shaking animation moves the element to the left and right sides. It can be done by using the `translateX` function:
 
