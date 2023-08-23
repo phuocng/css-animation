@@ -1,0 +1,279 @@
+---
+created: '2023-08-23'
+title: Pulse animation
+---
+
+A pulse animation effect is a type of animation that creates a pulsating and fading effect. It is often used to draw users attention to an element on a web page or in an app, such as a button or notification.
+
+To create a pulsing effect, we increase the size of an element and then gradually decrease it back to its original size. For a fading effect, we can adjust the element's opacity.
+
+Here's an example of how it looks using the `transform: scale` and `opacity` properties.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css styles.css
+:root {
+    --circle-size: 1rem;
+}
+
+.circle {
+    height: var(--circle-size);
+    width: var(--circle-size);
+    background: rgb(129 140 248);
+    border-radius: 9999px;
+
+    animation: pulse 1s cubic-bezier(.17,.67,.83,.67) infinite;
+}
+
+@keyframes pulse {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+```
+
+```html index.html
+<div class="circle">
+</div>
+```
+</Playground>
+
+In reality, this animation only requires two circles. The inner circle remains the same in terms of size and opacity, while the outer circle undergoes all the modifications.
+
+Now, let's explore some common methods for creating this type of layout.
+
+## Using the box shadow
+
+Creating a fake outer circle is possible without having to make two separate circles. The secret lies in using the `box-shadow` property.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css styles.css
+:root {
+    --circle-size: 1rem;
+}
+
+.circle {
+    height: var(--circle-size);
+    width: var(--circle-size);
+    background: rgb(99 102 241/1);
+    box-shadow: 0 0 0 0 rgb(129 140 248/1);
+    border-radius: 9999px;
+
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% {
+		transform: scale(0.95);
+		box-shadow: rgb(129 140 248/0.7);
+	}
+
+	75% {
+		transform: scale(1);
+		box-shadow: 0 0 0 calc(var(--circle-size)/2) rgba(129 140 248/0);
+	}
+
+	100% {
+		transform: scale(0.95);
+		box-shadow: 0 0 0 0 rgba(129 140 248/0);
+	}
+}
+```
+
+```html index.html
+<div class="circle">
+</div>
+```
+</Playground>
+
+## Using pseudo-elements
+
+Using the pseudo-elements `::before` and `::after` is a great way to represent inner and outer circles. By positioning them absolutely, they can take up the full size of the original element.
+
+```css styles.css
+.circle {
+    position: relative;
+}
+
+.circle::after,
+.circle::before {
+    content: '';
+
+    /* Position absolutely */
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    /* Take full size */
+    height: 100%;
+    width: 100%;
+
+    border-radius: 9999px;
+}
+```
+
+Check out the demo below, which showcases the animation on the `::before` element.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css styles.css
+:root {
+    --circle-size: 1rem;
+}
+
+.circle {
+    height: var(--circle-size);
+    width: var(--circle-size);
+    position: relative;
+}
+
+.circle::after,
+.circle::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 9999px;
+}
+
+.circle::before {
+    animation: pulse 1s cubic-bezier(.17,.67,.83,.67) infinite;
+    background: rgb(129 140 248);
+}
+
+.circle::after {
+    background: rgb(99 102 241);
+}
+
+@keyframes pulse {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+```
+
+```html index.html
+<div class="circle">
+</div>
+```
+</Playground>
+
+## Usages
+
+We can grab the user's attention with the pulse animation in specific areas. Let me give you some common examples.
+
+**User Onboarding**
+
+When a user visits your website for the first time, it's important to show them how to explore and get the most out of your site. This is known as user onboarding. It's also a great opportunity to introduce new features of your Sass-based application.
+
+**Notification badges**
+
+We can display a notification badge at the [top-right corner](https://phuoc.ng/collection/css-layout/docked-at-corner) of an element. This is used in many applications such as:
+
+-   An email client to show how many unread emails you have in your inbox,
+-   A messenger application to show how many unread messages you have,
+-   An online store to show how many customers you had in the last day.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css styles.css
+:root {
+    --circle-size: 1rem;
+}
+
+.notification {
+    position: relative;
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+
+    height: 2rem;
+    padding: 0 0.5rem;
+    border: 1px solid #d1d5db;
+    border-radius: 0.25rem;
+}
+
+.circle {
+    height: var(--circle-size);
+    width: var(--circle-size);
+
+    /* Show the circle at the top-right corner */
+    position: absolute;
+    right: 0;
+    top: 0;
+    transform: translate(50%, -50%);
+}
+
+.circle::after,
+.circle::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+    border-radius: 9999px;
+}
+
+.circle::before {
+    animation: pulse 1s cubic-bezier(.17,.67,.83,.67) infinite;
+    background: rgb(129 140 248);
+}
+
+.circle::after {
+    background: rgb(99 102 241);
+}
+
+@keyframes pulse {
+    75%, 100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+```
+
+```html index.html
+<div class="notification">
+    You have unread messages <div class="circle"></div>
+</div>
+```
+</Playground>
+
+## See also
+
+-   Learn how to create a [badge](https://phuoc.ng/collection/css-layout/badge)
+-   Discover how to dock an element on the on the [corner](https://phuoc.ng/collection/css-layout/docked-at-corner) of another element
