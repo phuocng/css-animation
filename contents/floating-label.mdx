@@ -1,0 +1,298 @@
+---
+created: '2023-08-26'
+description: How to create an animation for floating label layout
+openGraphCover: /og/css-animation/floating-label.png
+title: Floating label
+---
+
+The [floating label layout](https://phuoc.ng/collection/css-layout/floating-label) is a web form design pattern that makes forms look cleaner and more visually appealing. With this pattern, the label for an input field moves up and out of the way when the user starts typing in the field, freeing up valuable space on the form.
+
+In this post, we'll learn how to create an animation for this layout.
+
+## Markup
+
+Before we get started, we need to set up our HTML markup. Essentially, we'll be using a `label` and an `input` element. In this example, we'll be asking users to enter their email address.
+
+```html
+<div class="container">
+    <label class="label" for="emailAddress">Email address</label>
+    <input class="input" type="text" id="emailAddress" />
+</div>
+```
+
+By default, the label will be placed above the input. To achieve this, we'll position the label absolutely within its container using the following code:
+
+```css
+.container {
+    position: relative;
+}
+.label {
+    background: #fff;
+
+    /* Position absolutely */
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(1rem, -50%);
+}
+```
+
+It also gives the label a white background so that users won't see the top border of the input going through it.
+
+## Floating label animation
+
+Let's add a floating label animation to our code. To do this, we'll create a new CSS class called `label--float` that repositions and reduces the font size of the label.
+
+```css
+.label {
+    transition: transform 0.2s ease-out;
+}
+.label--float {
+    font-size: 0.875rem;
+    transform: translate(0, -100%);
+}
+```
+
+The `translate(0, -100%)` property will slide the label up to the top of the container. The `transition` property used by the `label` CSS class tells the browser to transition the label to the new position over a duration of 0.2 seconds, using the `ease-out` timing function.
+
+To apply this class when the input is in focus, we'll handle the `focus` event. Here's an example:
+
+```js
+const inputEle = document.getElementById('emailAddress');
+const labelEle = inputEle.previousElementSibling;
+
+inputEle.addEventListener('focus', () => {
+    labelEle.classList.add('label--float');
+});
+inputEle.addEventListener('blur', () => {
+    labelEle.classList.remove('label--float');
+});
+```
+
+Here, `inputEle` is a reference to the input element, and `labelEle` represents the label element, which is the previous sibling of the input.
+
+You can see this animation in action by focusing on the input and then clicking outside of it. The label will move to the top of the container and then return to its original position. Give it a try!
+
+<Playground>
+```css demo.css hidden
+/* For demonstration purposes */
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+input {
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.25rem;
+    height: 2.5rem;
+    width: 100%;
+}
+```
+
+```css styles.css
+.container {
+    width: 16rem;
+    position: relative;
+}
+.label {
+    background: #fff;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(1rem, -50%);
+    transition: transform 0.2s ease-out;
+}
+.label--float {
+    font-size: 0.875rem;
+    transform: translate(0, -100%);
+}
+```
+
+```html index.html
+<div class="container">
+    <label class="label" for="emailAddress">Email address</label>
+    <input class="input" type="text" id="emailAddress" />
+</div>
+```
+
+```js script.js
+document.addEventListener('DOMContentLoaded', () => {
+    const inputEle = document.getElementById('emailAddress');
+    const labelEle = inputEle.previousElementSibling;
+
+    inputEle.addEventListener('focus', () => {
+        labelEle.classList.add('label--float');
+    });
+    inputEle.addEventListener('blur', () => {
+        labelEle.classList.remove('label--float');
+    });
+});
+```
+</Playground>
+
+## CSS only solution
+
+The method described above uses JavaScript to add or remove a CSS class to the label, which isn't a scalable solution for large forms with many label and input pairs. Is there a way to achieve the same effect using CSS only?
+
+Regrettably, CSS does not have a selector to access the previous sibling element, unlike JavaScript's `focus` event.
+However, CSS does provide a way to access the next sibling element. We can rearrange the layout by moving the input in front of the label:
+
+```html
+<input class="input" type="text" id="emailAddress" />
+<label class="label" for="emailAddress">Email address</label>
+```
+
+Next, we can establish the CSS styles for the label when the input is in focus. These styles are identical to the `label--float` CSS class mentioned earlier.
+
+```css
+.input:focus ~ label {
+    font-size: 0.875rem;
+    transform: translate(0, -100%);
+}
+```
+
+The `~` character you see in the sample code above is a special selector in CSS called **general sibling combinator**. It allows us to easily access the next sibling element. By doing this way, we can trigger the animation without relying on JavaScript events.
+
+<Playground>
+```css demo.css hidden
+/* For demonstration purposes */
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+input {
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.25rem;
+    height: 2.5rem;
+    width: 100%;
+}
+```
+
+```css styles.css
+.container {
+    width: 16rem;
+    position: relative;
+}
+.label {
+    background: #fff;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(1rem, -50%);
+    transition: transform 0.2s ease-out;
+}
+.input:focus ~ label {
+    font-size: 0.875rem;
+    transform: translate(0, -100%);
+}
+```
+
+```html index.html
+<div class="container">
+    <input class="input" type="text" id="emailAddress" />
+    <label class="label" for="emailAddress">Email address</label>
+</div>
+```
+</Playground>
+
+## Using the placeholder attribute
+
+While using the pair of label and input to organize form fields is common, in many cases, the label and input placeholder are identical. This leads to the question: is it possible to achieve the same animation effect without using an additional label?
+
+Let's give it a shot by setting the `placeholder` attribute for the input field.
+
+```html
+<input class="input" type="text" placeholder="Email address" />
+```
+
+Next, we're going to replace the `label` element with the `:before` pseudo-element. This element is positioned absolutely within the input and takes the content of the `placeholder` attribute.
+
+```css
+.input {
+    position: relative;
+}
+.input::before {
+    content: attr(placeholder);
+
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+```
+
+While this approach may seem promising in theory, it doesn't actually work. Although we can use the same technique to customize checkbox or radio inputs, it doesn't work with text fields.
+
+This means we can't avoid using the label element. However, we don't want to repeat information that already appears in the input placeholder and the label. So, we can initially hide the label by setting its opacity to zero:
+
+```css
+.label {
+    opacity: 0;
+}
+```
+
+When users start typing in the input field, the placeholder disappears. At this point, we can take advantage of the `:not(:placeholder-shown)` selector. This allows us to animate the label by resetting its opacity to 1, making it visible.
+
+```css
+.input:not(:placeholder-shown) ~ label {
+    transform: translate(0, -100%);
+    opacity: 1;
+}
+```
+
+Check out the demo below and try entering something in the input field!
+
+<Playground>
+```css demo.css hidden
+/* For demonstration purposes */
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+input {
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.25rem;
+    padding: 0.5rem 0.25rem;
+    height: 2.5rem;
+    width: 100%;
+}
+```
+
+```css styles.css
+.container {
+    width: 16rem;
+    position: relative;
+}
+.label {
+    background: #fff;
+    opacity: 0;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(0, 100%);
+    transition: transform 0.2s linear;
+}
+.input {
+    /* Make the input displayed on top of label */
+    position: relative;
+    z-index: 1;
+}
+.input:not(:placeholder-shown) ~ label {
+    transform: translate(0, -100%);
+    opacity: 1;
+}
+```
+
+```html index.html
+<div class="container">
+    <input class="input" type="text" id="emailAddress" placeholder="Email address" />
+    <label class="label" for="emailAddress">Email address</label>
+</div>
+```
+</Playground>
