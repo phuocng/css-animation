@@ -1,0 +1,460 @@
+---
+created: '2023-08-25'
+description: A few ways to create a skeleton loading effect
+openGraphCover: /og/css-animation/skeleton-loading.png
+title: Skeleton loading
+---
+
+Have you ever visited a website and seen a blank page or a section that seems to be loading, only to be replaced with content a moment later? If so, you may have witnessed a skeleton loading animation. This technique is used to improve the user experience by indicating that content is loading and to prevent users from perceiving a delay or lag.
+
+In this post, we'll explore a few ways to create this skeleton loading effect.
+
+## Using SVG animations
+
+The SVG element below uses a linear gradient to animate a circle that's within its clip path.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```html index.html
+<svg
+    width="150"
+    height="150"
+    viewBox="0 0 150 150"
+>
+    <rect
+        x="0"
+        y="0"
+        width="100%"
+        height="100%"
+        clip-path="url(#loading)"
+        fill="url(#animation)"
+    ></rect>
+    <defs>
+        <clipPath id="loading">
+            <circle cx="20" cy="20" r="20"></circle>
+        </clipPath>
+        <linearGradient id="animation">
+            <stop
+                offset="0%"
+                stop-color="rgb(243 243 243)"
+                stop-opacity="1"
+            >
+                <animate
+                    attributeName="offset"
+                    dur="2s"
+                    keyTimes="0; 0.25; 1"
+                    repeatCount="indefinite"
+                    values="-2; -2; 1"
+                ></animate>
+            </stop>
+            <stop
+                offset="50%"
+                stop-color="rgb(236 236 236)"
+                stop-opacity="1"
+            >
+                <animate
+                    attributeName="offset"
+                    dur="2s"
+                    keyTimes="0; 0.25; 1"
+                    repeatCount="indefinite"
+                    values="-1; -1; 2"
+                ></animate>
+            </stop>
+            <stop
+                offset="100%"
+                stop-color="rgb(243 243 243)"
+                stop-opacity="1"
+            >
+                <animate
+                    attributeName="offset"
+                    dur="2s"
+                    keyTimes="0; 0.25; 1"
+                    repeatCount="indefinite"
+                    values="0; 0; 3"
+                ></animate>
+            </stop>
+        </linearGradient>
+    </defs>
+</svg>
+```
+</Playground>
+
+While it works, there are some drawbacks. For one, it's not reusable. If you want to create different shapes for the skeleton, you'll need to duplicate the entire SVG element every time.
+
+Using frameworks can improve reusability. For example, we can create a React component to wrap the SVG. This component includes configurable props such as the dimensions (`height` and `width`) and the animated background (`backgroundColor`) and foreground (`foregroundColor`) colors.
+
+<Playground template="react">
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```tsx Skeleton.tsx
+type SkeletonProps = {
+    backgroundColor: string;
+    foregroundColor: string;
+    height: number;
+    width: number;
+    children: React.ReactNode;
+};
+
+const Skeleton: React.FC<SkeletonProps> = ({
+    backgroundColor,
+    foregroundColor,
+    height,
+    width,
+    children,
+}) => {
+    const gradientRatio = 2;
+    const duration = '2s';
+    const interval = 0.25;
+    const keyTimes = `0; ${interval}; 1`;
+
+    return (
+        <svg
+            width={width}
+            height={height}
+            viewBox={`0 0 ${width} ${height}`}
+        >
+            <rect
+                x="0"
+                y="0"
+                width="100%"
+                height="100%"
+                clipPath="url(#loading)"
+                fill="url(#animation)"
+            ></rect>
+            <defs>
+                <clipPath id="loading">
+                    {children}
+                </clipPath>
+                <linearGradient id="animation">
+                    <stop
+                        offset="0%"
+                        stopColor={backgroundColor}
+                        stopOpacity="1"
+                    >
+                        <animate
+                            attributeName="offset"
+                            dur={duration}
+                            keyTimes={keyTimes}
+                            repeatCount="indefinite"
+                            values={`${-gradientRatio}; ${-gradientRatio}; 1`}
+                        ></animate>
+                    </stop>
+                    <stop
+                        offset="50%"
+                        stopColor={foregroundColor}
+                        stopOpacity="1"
+                    >
+                        <animate
+                            attributeName="offset"
+                            dur={duration}
+                            keyTimes={keyTimes}
+                            repeatCount="indefinite"
+                            values={`${-gradientRatio / 2}; ${-gradientRatio / 2}; ${1 + gradientRatio / 2}`}
+                        ></animate>
+                    </stop>
+                    <stop
+                        offset="100%"
+                        stopColor={backgroundColor}
+                        stopOpacity="1"
+                    >
+                        <animate
+                            attributeName="offset"
+                            dur={duration}
+                            keyTimes={keyTimes}
+                            repeatCount="indefinite"
+                            values={`0; 0; ${1 + gradientRatio}`}
+                        ></animate>
+                    </stop>
+                </linearGradient>
+            </defs>
+        </svg>
+    );
+};
+```
+
+```tsx App.tsx
+export default Index = () => (
+    <Skeleton
+        backgroundColor="rgb(243 243 243"
+        foregroundColor="rgb(236 236 236)"
+        height={100}
+        width={300}
+    >
+        <circle cx={20} cy={20} r={20} />
+        <rect x={50} y={0} rx={3} ry={3} width={300} height={8} />
+        <rect x={50} y={15} rx={3} ry={3} width={200} height={8} />
+        <rect x={50} y={30} rx={3} ry={3} width={100} height={8} />
+    </Skeleton>
+);
+```
+</Playground>
+
+In the code example given, the `Skeleton` component can only accept SVG elements as its `children`. Unfortunately, it's not possible to display regular HTML elements. Additionally, you have to manually calculate the boundary and position the children SVG element very carefully to ensure they're displayed where you want them. Frankly, it's a bit of a hassle.
+
+```tsx App.tsx
+<Skeleton>
+    <circle cx={20} cy={20} r={20} />
+    <rect x={50} y={0} rx={3} ry={3} width={300} height={8} />
+    <rect x={50} y={15} rx={3} ry={3} width={200} height={8} />
+    <rect x={50} y={30} rx={3} ry={3} width={100} height={8} />
+</Skeleton>
+```
+
+It's not practical to build a complex skeleton with many sub-elements. For example, think about creating a preview for a table. Instead, we can use a CSS-based solution to solve these issues. Let's move on to the next section to learn more.
+
+## Animating the opacity
+
+In this approach, we're using the animation property to create a pulsating effect. The animation is called `pulse` and lasts for 2 seconds, with a smooth ease-in-out timing function. It repeats infinitely, so the effect continues as long as needed.
+
+The `pulse` animation uses keyframes to change the element's opacity over time, giving it that cool pulsing look.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+:root {
+    --circle-size: 2.5rem;
+}
+.circle {
+    height: var(--circle-size);
+    width: var(--circle-size);
+    background: rgb(203 213 225);
+    border-radius: 9999px;
+}
+```
+
+```css styles.css
+.skeleton {
+    animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .5;
+    }
+}
+```
+
+```html index.html
+<div class="skeleton">
+    <div class="circle"></div>
+</div>
+```
+</Playground>
+
+Let's go back to the demonstration we saw earlier. You can create different shapes for free, and then you have full control over how they look and where they go. It's all up to you!
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+.right {
+    flex: 1;
+}
+```
+
+```css styles.css
+:root {
+    --circle-size: 2.5rem;
+}
+
+/* Shapes */
+.circle {
+    height: var(--circle-size);
+    width: var(--circle-size);
+    background: rgb(203 213 225);
+    border-radius: 9999px;
+    margin-right: 0.5rem;
+}
+.rectangle {
+    background: rgb(203 213 225);
+    border-radius: 0.25rem;
+    height: 0.5rem;
+    margin-bottom: 0.5rem;
+}
+
+.skeleton {
+    animation: pulse 2s ease-in-out infinite;
+    display: flex;
+    width: 16rem;
+}
+
+@keyframes pulse {
+    50% {
+        opacity: .5;
+    }
+}
+```
+
+```html index.html
+<div class="skeleton">
+    <div class="circle"></div>
+    <div class="right">
+        <div class="rectangle"></div>
+        <div class="rectangle"></div>
+        <div class="rectangle"></div>
+    </div>
+</div>
+```
+</Playground>
+
+## Sliding the placeholder
+
+Now for the final approach. Firstly, we'll use a pseudo-element to create a fake placeholder element that sits inside the original skeleton element and is positioned absolutely. This placeholder element will also take up the full size of the skeleton.
+
+```css
+.skeleton {
+    position: relative;
+}
+
+.skeleton::before {
+    /* Make it empty */
+    content: '';
+
+    /* Position absolutely */
+    position: absolute;
+    left: 0;
+    top: 0;
+
+    /* Take the full dimension */
+    height: 100%;
+    width: 100%;
+}
+```
+
+At first, the placeholder sits to the left outside its container. Then, every 2 seconds, it moves to the right while filling up with a light background color. This creates the loading effect that we all know and love.
+
+And hey, if you want to get fancy with the colors, you can use the `linear-gradient` function to produce a gradient effect.
+
+```css
+:root {
+    --skeleton-duration: 2s;
+}
+
+.skeleton::before {
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05), transparent);
+    transform: translateX(-100%);
+    animation: slide var(--skeleton-duration) ease-in-out infinite;
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+```
+
+In the final demonstration, you can choose to show the sliding effect by selecting the corresponding option. This will allow you to see how the placeholder slides from left to right within the skeleton. Additionally, you can adjust the duration of the animation to make it run faster or slower.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+label {
+    cursor: pointer;
+    display: block;
+    margin: 0.5rem 0;
+}
+input[type="range"] {
+    cursor: pointer;
+    width: 100%;
+}
+```
+
+```css styles.css
+:root {
+    --skeleton-duration: 2s;
+    --skeleton-overflow: hidden;
+}
+
+.rectangle {
+    background: rgb(203 213 225);
+    border-radius: 0.25rem;
+    height: 8rem;
+    width: 16rem;
+}
+
+.skeleton {
+    position: relative;
+    overflow: var(--skeleton-overflow);
+}
+.skeleton::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.05), transparent);
+    transform: translateX(-100%);
+
+    animation: slide var(--skeleton-duration) ease-in-out infinite;
+}
+
+@keyframes slide {
+    0% {
+        transform: translateX(-100%);
+    }
+    100% {
+        transform: translateX(100%);
+    }
+}
+```
+
+```html index.html
+<div class="skeleton">
+    <div class="rectangle"></div>
+</div>
+
+<!-- For debugging purposes -->
+<label>
+    <input type="checkbox" id="showEffect"> Show the sliding effect
+</label>
+
+<div>Change the duration (1-10s):</div>
+<input type="range" min="1" max="10" id="durationRange" />
+```
+
+```js scripts.js hidden
+document.addEventListener('DOMContentLoaded', () => {
+    const showEffectEle = document.getElementById('showEffect');
+    const durationRangeEle = document.getElementById('durationRange');
+
+    showEffectEle.addEventListener('change', (e) => {
+        const checked = e.target.checked;
+        const overflow = checked ? 'visible' : 'hidden';
+        document.documentElement.style.setProperty('--skeleton-overflow', overflow);
+    });
+
+    durationRangeEle.addEventListener('change', (e) => {
+        document.documentElement.style.setProperty('--skeleton-duration', `${e.target.value}s`);
+    });
+});
+```
+</Playground>
