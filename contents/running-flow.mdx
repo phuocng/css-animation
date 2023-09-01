@@ -1,0 +1,279 @@
+---
+created: '2023-08-26'
+description: Create a running flow animation in CSS
+openGraphCover: /og/css-animation/running-flow.png
+title: Running flow
+---
+
+Adding animations to your website or app can be a fun and engaging way to spruce up the visuals. One type of animation that can really catch the eye is the running flow animation. It gives the impression that an arrow or other object is smoothly flowing or moving across the screen. And the best part? You can create this effect in CSS!
+
+In this tutorial, I'll show you different ways to create a cool running flow animation using CSS. Our layout will feature two steps on the left and right sides, connected by an arrow in the middle. But don't worry, you can always add more steps and connectors to fit your needs. Let's get started!
+
+## Using SVG animation
+
+For our first approach, we'll use an SVG element as the connector. The SVG only contains a single line element, as you can see below:
+
+```html
+<svg class="connector" width="120" height="2" viewBox="0 0 120 2" fill="none">
+    <line
+        class="connector__line"
+        y1="1"
+        x2="120"
+        y2="1"
+        stroke-width="2"
+    ></line>
+</svg>
+```
+
+To create a line using the smaller dashes, we can use the `stroke-dasharray` attribute directly for the line, or use the same CSS property. In this example, I'll be using the latter approach.
+
+```css
+.connector__line {
+    stroke-dasharray: 10 5;
+}
+```
+
+Don't worry if you're not familiar with the `stroke-dasharray` property. It's actually pretty easy to understand. In this example, we've set `stroke-dasharray` to an array of values that determine the length of each dash (10 pixels) and the space between them (5 pixels).
+
+Now it's time to add some animation to our connector. This will make it appear to be flowing or moving across the steps. To achieve this effect, we can take advantage of the `stroke-dashoffset` property. This property determines the distance between the start of the dash array and the beginning of the stroke. By animating this property over time, we can create the illusion of movement, as if our arrow is flowing across the steps.
+
+To begin, we can set `stroke-dashoffset` to be equal to the total length of our SVG line (in this case, 120 pixels), so that it's invisible at first. Then, in our animation, we can gradually decrease `stroke-dashoffset` until it reaches 0. This will reveal our entire line and give us a smooth flowing effect.
+
+Here's an example CSS code block that implements this animation:
+
+```css
+.connector__line {
+    stroke-dashoffset: 120;
+}
+@keyframes flow {
+    from {
+        stroke-dashoffset: 120;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+```
+
+Finally, we define an animation called `flow` that runs for five second (`5s`) with a linear timing function. To make sure the connector flows indefinitely, we've set the animation to run infinitely.
+
+```css
+.connector__line {
+    animation: flow 5s linear infinite;
+}
+```
+
+> **Good to know**
+>
+> You can't use the word `running` to name an animation. If you declare `animation: running 5s linear infinite;` in the animation shorthand, `running` will be interpreted as the playing state, not the animation name.
+
+If you want to make the connector flow in the opposite direction (from right to left), simply begin the animation with a negative value for the `stroke-dashoffset` property.
+
+```css
+@keyframes flow {
+    from {
+        stroke-dashoffset: -120;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+```
+
+Let's check out this stunning animation together!
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+
+    height: 4rem;
+    width: 4rem;
+    background: rgb(203 213 225);
+    border-radius: 0.5rem;
+}
+```
+
+```css styles.css
+.connector__line {
+    stroke: rgb(148 163 184);
+    stroke-dasharray: 10 5;
+    stroke-dashoffset: 120;
+    animation: flow 5s linear infinite;
+}
+@keyframes flow {
+    from {
+        stroke-dashoffset: 120;
+    }
+    to {
+        stroke-dashoffset: 0;
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="step">A</div>
+    <svg class="connector" width="120" height="2" viewBox="0 0 120 2" fill="none">
+        <line
+            class="connector__line"
+            y1="1"
+            x2="120"
+            y2="1"
+            stroke-width="2"
+        ></line>
+    </svg>
+    <div class="step">B</div>
+</div>
+```
+</Playground>
+
+## Using a mask
+
+The idea behind this approach is to use an SVG arrow as a background and repeat it to create a connector.
+
+```css
+.connector {
+    background: url("/path/to/arrow.svg") repeat;
+}
+```
+
+While trying to adjust the background position to flow between the steps, I encountered some trouble. Luckily, CSS has a powerful technique called masking that can help.
+
+CSS masking allows you to hide or reveal parts of an element using another element as a mask. This technique can create interesting effects such as cut-out shapes and gradient fades. The mask's transparent areas will show the content of the masked element, while opaque areas will hide it.
+
+To try it out, let's replace the background property with the mask. Keep in mind that we need to add a browser prefix to ensure it works on Chrome.
+
+```css
+.connector {
+    -webkit-mask: url("/path/to/arrow.svg");
+    mask: url("/path/to/arrow.svg");
+}
+```
+
+The arrow SVG used in this approach is simply a polygon tag that creates the arrow shape.
+
+```html arrow.svg
+<svg xmlns="http://www.w3.org/2000/svg" width="18" height="16">
+    <polygon points="0 0 0 16 16 8"></polygon>
+</svg>
+```
+
+Since the SVG is missing a background, we must assign a background color to the connector. This will fill our mask.
+
+```css
+.connector {
+    background: rgb(226 232 240);
+}
+```
+
+Now, we're going to use the `mask-position` property to add some animation to our mask position. This technique is similar to the previous one where we used an SVG, but instead of animating the `stroke-dashoffset` property, we'll be animating the position of the mask.
+
+To achieve this, we'll define an animation that gradually moves our arrow from left to right, across our steps.
+
+```css
+:root {
+    --arrow-width: 1.125rem;
+}
+.connector {
+    animation: flow 5s linear infinite;
+}
+
+@keyframes flow {
+    from {
+        -webkit-mask-position-x: calc(0% - var(--arrow-width));
+    }
+
+    to {
+        -webkit-mask-position-x: calc(100% + var(--arrow-width));
+    }
+}
+```
+
+The variable `--arrow-width` tells us the width of an arrow. Specifically, it's set at 18 pixels, which is equivalent to 1.125rem.
+
+The code above creates an animation named `flow` that lasts for five seconds, repeats indefinitely, and uses a linear timing function. We've used the `calc()` function to calculate the `mask-position-x` values. This ensures that the animation starts just outside of our first step and ends just outside of our second step.
+
+It's time to see the results of all the steps we've taken so far.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.step {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+
+    height: 4rem;
+    width: 4rem;
+    background: rgb(203 213 225);
+    border-radius: 0.5rem;
+}
+```
+
+```css styles.css
+:root {
+    --arrow-height: 1rem;
+    --arrow-width: 1.125rem;
+}
+.connector {
+    background: rgb(226 232 240);
+    -webkit-mask: url("/assets/css-animation/arrow.svg");
+    mask: url("/assets/css-animation/arrow.svg");
+
+    width: 8rem;
+    height: var(--arrow-height);
+    animation: flow 5s linear infinite;
+}
+@keyframes flow {
+    from {
+        -webkit-mask-position-x: calc(0% - var(--arrow-width));
+    }
+
+    to {
+        -webkit-mask-position-x: calc(100% + var(--arrow-width));
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="step">A</div>
+    <div class="connector"></div>
+    <div class="step">B</div>
+</div>
+```
+</Playground>
+
+If you want to prevent the browser from making a separate request to load your SVG, you can encode it and pass it directly to the url function. We've used this method for background properties in many cases.
+
+Check out the sample code below to see how it's done.
+
+```css
+.connector {
+    mark: url("data:image/svg+xml;charset=utf8,%3Csvg width='18' height='16'%3E%3Cpolygon points='0 0 0 16 16 8'/%3E%3C/svg%3E%0A");
+}
+```
