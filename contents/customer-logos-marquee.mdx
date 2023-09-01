@@ -1,0 +1,488 @@
+---
+created: '2023-08-27'
+description: How to create a customer logos marquee animation in CSS
+openGraphCover: /og/css-animation/customer-logos-marquee.png
+title: Customer logos marquee
+---
+
+If you want to showcase your customers or partners on your website, you can create a cool logos marquee animation using CSS. This animation will display logos of your customers or partners in a continuous loop, which can add an interactive and eye-catching element to your website.
+
+In this post, we'll explore how to create this kind of animation in CSS. To keep things simple, this example uses alphabetical characters to represent the logos. Of course, in real life, you would use the actual logos.
+
+## Markup
+
+To get started, you'll need to create an HTML container where the logos will be placed.
+
+```html
+<div class="container">
+    <div class="logo">A</div>
+    <div class="logo">B</div>
+    <div class="logo">C</div>
+    <div class="logo">D</div>
+    <div class="logo">E</div>
+    <div class="logo">F</div>
+    <div class="logo">G</div>
+    <div class="logo">H</div>
+</div>
+```
+
+The logos should be aligned horizontally within their container and we need to make sure they don't overflow.
+
+```css
+.container {
+    display: flex;
+    overflow: hidden;
+}
+```
+
+## The marquee tag: A vintage HTML animation
+
+Did you know that the name of animation was inspired by a real HTML tag called `marquee`?
+
+The `marquee` tag was a non-standard HTML element that created a scrolling effect for content within it. It became popular in the late 90s and early 2000s as a way to add dynamic, eye-catching effects to web pages. However, due to potential accessibility issues and its non-standard nature, it has fallen out of favor in recent years.
+
+In fact, the `marquee` tag is not supported in HTML5 and should be avoided. Let's take a look at what the marquee effect looks like without using any animation.
+
+<Playground>
+```css demo.css hidden
+.playground__root {
+    align-items: center;
+    display: flex;
+    height: 100%;
+}
+.logo {
+    font-size: 3rem;
+    font-weight: 600;
+    margin: 0 1.5rem;
+}
+```
+
+```css styles.css
+.container {
+    display: flex;
+    overflow: hidden;
+}
+```
+
+```html index.html
+<marquee>
+    <div class="container">
+        <div class="logo">A</div>
+        <div class="logo">B</div>
+        <div class="logo">C</div>
+        <div class="logo">D</div>
+        <div class="logo">E</div>
+        <div class="logo">F</div>
+        <div class="logo">G</div>
+        <div class="logo">H</div>
+    </div>
+</marquee>
+```
+</Playground>
+
+## Marquee animation
+
+Creating a marquee animation is a breeze. We'll call it "marquee" and it'll slide the target from right to left. First, we'll keep the target in place and then gradually move it to the left until it's out of the container. Piece of cake!
+
+```css
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+```
+
+In this example, the animation will move the container continuously from right to left for 20 seconds, using a linear timing function. Feel free to tweak the duration and timing function to match your specific needs.
+
+```css
+.container {
+    animation: marquee 20s linear infinite;
+}
+```
+
+Here's where we're at:
+
+<Playground>
+```css demo.css hidden
+.playground__root {
+    align-items: center;
+    display: flex;
+    height: 100%;
+}
+.logo {
+    font-size: 3rem;
+    font-weight: 600;
+    margin: 0 1.5rem;
+}
+```
+
+```css styles.css
+.container {
+    display: flex;
+    overflow: hidden;
+    animation: marquee 20s linear infinite;
+}
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="logo">A</div>
+    <div class="logo">B</div>
+    <div class="logo">C</div>
+    <div class="logo">D</div>
+    <div class="logo">E</div>
+    <div class="logo">F</div>
+    <div class="logo">G</div>
+    <div class="logo">H</div>
+</div>
+```
+</Playground>
+
+There are a couple of issues that need fixing. First, it would be better if the left and right sides looked faded out. The second, more important issue is that there's blank space when the last logo is moved to the left.
+
+In the next sections, we'll tackle these problems head-on.
+
+## Fading the left and right sides
+
+To fix the first issue, we'll put the container within an element and then fade out the left and right sides of the newly created element.
+
+```html
+<div class="wrapper">
+    <div class="container">
+        ...
+    </div>
+</div>
+```
+
+To create a fading effect, you can use the `:before` and `:after` pseudo-elements. They're positioned on the left and right sides, and they take up the full height of their parent element.
+
+```css
+.wrapper {
+    position: relative;
+}
+.wrapper::after,
+.wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+
+    height: 100%;
+    width: 2rem;
+    z-index: 1;
+}
+```
+
+The `z-index` property helps elements appear on top of logos. To create a fading effect on both sides, we use the `linear-gradient` function. For the `:before` element, the function creates a gradient from left to right. For the `:after` element, the gradient goes in the opposite direction. Here's an example:
+
+```css
+.wrapper::before {
+    background: linear-gradient(to right, rgb(241 245 249), transparent);
+    left: 0;
+}
+.wrapper::after {
+    background: linear-gradient(to left, rgb(241 245 249), transparent);
+    right: 0;
+}
+```
+
+The first issue has been resolved.
+
+<Playground>
+```css demo.css hidden
+.playground__root {
+    align-items: center;
+    display: flex;
+    height: 100%;
+}
+.logo {
+    font-size: 3rem;
+    font-weight: 600;
+    margin: 0 1.5rem;
+}
+```
+
+```css styles.css
+.wrapper {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+}
+.wrapper::after,
+.wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+
+    height: 100%;
+    width: 2rem;
+    z-index: 1;
+}
+.wrapper::after {
+    background: linear-gradient(to left, rgb(241 245 249), transparent);
+    right: 0;
+}
+.wrapper::before {
+    background: linear-gradient(to right, rgb(241 245 249), transparent);
+    left: 0;
+}
+.container {
+    display: flex;
+    animation: marquee 20s linear infinite;
+}
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+```
+
+```html index.html
+<div class="wrapper">
+    <div class="container">
+        <div class="logo">A</div>
+        <div class="logo">B</div>
+        <div class="logo">C</div>
+        <div class="logo">D</div>
+        <div class="logo">E</div>
+        <div class="logo">F</div>
+        <div class="logo">G</div>
+        <div class="logo">H</div>
+    </div>
+</div>
+```
+</Playground>
+
+## Achieving continuous sliding
+
+Now, let's talk about making the logos slide continuously. We have two options: we can either duplicate the container or use JavaScript to clone the container and append it to the wrapper element. The first approach is simpler, where we can create a duplication in static HTML. However, if you prefer the second approach, go for it!
+
+For this example, I'll be using the first approach.
+
+```html
+<div class="wrapper">
+    <div class="container">
+        ...
+    </div>
+    <!-- The duplication -->
+    <div class="container">
+        ...
+    </div>
+</div>
+```
+
+Naturally, we need to add extra styles to the wrapper to ensure that the cloned element aligns horizontally with the original element.
+
+```css
+.wrapper {
+    display: flex;
+}
+```
+
+Let's check out the final result. When you reach the last logo, represented by the letter H, keep watching. The next animation features the first character, represented by the letter A.
+
+<Playground>
+```css demo.css hidden
+.playground__root {
+    align-items: center;
+    display: flex;
+    height: 100%;
+}
+.logo {
+    font-size: 3rem;
+    font-weight: 600;
+    margin: 0 1.5rem;
+}
+```
+
+```css styles.css
+.wrapper {
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+.wrapper::after,
+.wrapper::before {
+    content: '';
+    position: absolute;
+    top: 0;
+
+    height: 100%;
+    width: 2rem;
+    z-index: 1;
+}
+.wrapper::after {
+    background: linear-gradient(to left, rgb(241 245 249), transparent);
+    right: 0;
+}
+.wrapper::before {
+    background: linear-gradient(to right, rgb(241 245 249), transparent);
+    left: 0;
+}
+.container {
+    display: flex;
+    animation: marquee 20s linear infinite;
+}
+@keyframes marquee {
+    0% {
+        transform: translateX(0);
+    }
+    100% {
+        transform: translateX(-100%);
+    }
+}
+```
+
+```html index.html
+<div class="wrapper">
+    <div class="container">
+        <div class="logo">A</div>
+        <div class="logo">B</div>
+        <div class="logo">C</div>
+        <div class="logo">D</div>
+        <div class="logo">E</div>
+        <div class="logo">F</div>
+        <div class="logo">G</div>
+        <div class="logo">H</div>
+    </div>
+    <div class="container">
+        <div class="logo">A</div>
+        <div class="logo">B</div>
+        <div class="logo">C</div>
+        <div class="logo">D</div>
+        <div class="logo">E</div>
+        <div class="logo">F</div>
+        <div class="logo">G</div>
+        <div class="logo">H</div>
+    </div>
+</div>
+```
+</Playground>
+
+## Usages
+
+The technique discussed in this post can be used for various purposes, such as featuring customer logos or testimonials. As an example, we can automatically scroll through customer testimonials from bottom to top, creating a dynamic effect.
+
+To achieve this, we may need to make some modifications to the animation direction. For instance, we can create a faded out effect by generating a vertical gradient.
+
+```css
+.wrapper::after {
+    background: linear-gradient(to top, rgb(241 245 249), transparent);
+    bottom: 0;
+}
+.wrapper::before {
+    background: linear-gradient(to bottom, rgb(241 245 249), transparent);
+    top: 0;
+}
+```
+
+The marquee animation slides the element upward, so you'll need to change its position only along the Y-axis.
+
+```css
+@keyframes marquee {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+```
+
+The example below is just like the one we created earlier, except the animation now moves vertically instead of horizontally.
+
+<Playground>
+```css demo.css hidden
+.playground__root {
+    display: flex;
+    justify-content: center;
+    height: 100%;
+}
+.testimonial {
+    font-size: 3rem;
+    font-weight: 600;
+    margin: 1.5rem 0;
+}
+```
+
+```css styles.css
+.wrapper {
+    overflow: hidden;
+    position: relative;
+    height: 20rem;
+    width: 12rem;
+    text-align: center;
+}
+.wrapper::after,
+.wrapper::before {
+    content: '';
+    position: absolute;
+    left: 0;
+
+    width: 100%;
+    height: 2rem;
+    z-index: 1;
+}
+.wrapper::after {
+    background: linear-gradient(to top, rgb(241 245 249), transparent);
+    bottom: 0;
+}
+.wrapper::before {
+    background: linear-gradient(to bottom, rgb(241 245 249), transparent);
+    top: 0;
+}
+.container {
+    animation: marquee 20s linear infinite;
+}
+@keyframes marquee {
+    0% {
+        transform: translateY(0);
+    }
+    100% {
+        transform: translateY(-100%);
+    }
+}
+```
+
+```html index.html
+<div class="wrapper">
+    <div class="container">
+        <div class="testimonial">A</div>
+        <div class="testimonial">B</div>
+        <div class="testimonial">C</div>
+        <div class="testimonial">D</div>
+        <div class="testimonial">E</div>
+        <div class="testimonial">F</div>
+        <div class="testimonial">G</div>
+        <div class="testimonial">H</div>
+    </div>
+    <div class="container">
+        <div class="testimonial">A</div>
+        <div class="testimonial">B</div>
+        <div class="testimonial">C</div>
+        <div class="testimonial">D</div>
+        <div class="testimonial">E</div>
+        <div class="testimonial">F</div>
+        <div class="testimonial">G</div>
+        <div class="testimonial">H</div>
+    </div>
+</div>
+```
+</Playground>
+
+## See also
+
+-   [Fading long section](https://phuoc.ng/collection/css-layout/fading-long-section)
