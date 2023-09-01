@@ -1,0 +1,144 @@
+---
+created: '2023-08-26'
+description: Create a rotating texts effect in CSS
+openGraphCover: /og/css-animation/rotating-texts.png
+title: Rotating texts
+---
+
+A rotating text effect is a cool animated effect that cycles through a series of different text messages. It's a fantastic way to add some visual interest to your website and draw attention to important content.
+
+In this post, I'll show you how to create a rotating text animation using CSS. It's easier than you might think, so let's get started!
+
+## Markup
+
+First things first, let's set up the basic markup. The layout consists of three layers:
+
+-   The outermost element, which wraps all the other elements. It has only one child node, which has the CSS class `container__inner`.
+-   The middle layer, which contains the `container__inner` element.
+-   The innermost layer, which contains individual elements for each text you want to rotate through.
+
+```html
+<div class="container">
+    <div class="container__inner">
+        <div class="container__text">iPhone</div>
+        <div class="container__text">iPad</div>
+        <div class="container__text">Chrome</div>
+        <div class="container__text">Firefox</div>
+        <div class="container__text">Safari</div>
+    </div>
+</div>
+```
+
+The container and text elements should be the same height. Plus, we need to add the `overflow: hidden` style to keep our text from overflowing outside the container.
+
+```css
+.container {
+    overflow: hidden;
+    height: 4rem;
+}
+.container__text {
+    height: 4rem;
+}
+```
+
+## Rotating effect
+
+To animate text elements one by one, we can create keyframes called `slide`. In each phase, the element will move up to the same height as the current text. Since each text has a height of `4rem` and there are 5 text elements in total, the animation could move the target element up by a multiple of `4rem` which is `4rem`, `8rem`, `12rem`, and `16rem`, respectively.
+
+At the end of the animation, the target will slide back down to its original position, revealing the first text element as the beginning phrase.
+
+```css
+@keyframes slide {
+    0%, 10% {
+        transform: translateY(0);
+    }
+    20%, 30% {
+        transform: translateY(-4rem);
+    }
+    40%, 50% {
+        transform: translateY(-8rem);
+    }
+    60%, 70% {
+        transform: translateY(-12rem);
+    }
+    80%, 90% {
+        transform: translateY(-16rem);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+```
+
+Finally, the inner element will run the animation for 10 seconds using the linear timing function, and with the `infinite` value set, the animation will loop indefinitely.
+
+```css
+.container__inner {
+    animation: slide 10s linear infinite;
+}
+```
+
+Check out the rotating text animation in action!
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.container {
+    overflow: hidden;
+    font-weight: 600;
+    font-size: 3rem;
+    height: 4rem;
+}
+.container__inner {
+    animation: slide 10s linear infinite;
+}
+.container__text {
+    height: 4rem;
+}
+
+@keyframes slide {
+    0%, 10% {
+        transform: translateY(0);
+    }
+    20%, 30% {
+        transform: translateY(-4rem);
+    }
+    40%, 50% {
+        transform: translateY(-8rem);
+    }
+    60%, 70% {
+        transform: translateY(-12rem);
+    }
+    80%, 90% {
+        transform: translateY(-16rem);
+    }
+    100% {
+        transform: translateY(0);
+    }
+}
+```
+
+```html index.html
+<div>
+    This website looks great on
+</div>
+<div class="container">
+    <div class="container__inner">
+        <div class="container__text">iPhone</div>
+        <div class="container__text">iPad</div>
+        <div class="container__text">Chrome</div>
+        <div class="container__text">Firefox</div>
+        <div class="container__text">Safari</div>
+    </div>
+</div>
+```
+</Playground>
+
+To add more text, just include additional `div` elements with the class `container__text` and adjust the position in the `slide` keyframes accordingly. It's that simple!
