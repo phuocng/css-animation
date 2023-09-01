@@ -1,0 +1,203 @@
+---
+created: '2023-08-28'
+description: Highlight target element in CSS
+openGraphCover: /og/css-animation/highlighting-target.png
+title: Highlighting target element
+---
+
+Do you want to draw your users' attention to a specific element on your webpage when they scroll to it? Highlighting that element could be the perfect solution. In this post, we'll show you how to create an animation that highlights your target element.
+
+## Anchor elements
+
+To scroll to a specific element on a page, there are two common ways to do it. You can either use JavaScript DOM APIs like `window.scrollTo` or `window.scrollTop` to update the scroll position, or you can use the `id` attribute of the target element.
+
+The second approach is better for accessibility because you can share direct links. For example, let's say we have a section with the `id` of `section-1`.
+
+```html
+<div id="section-1">...</div>
+```
+
+To access the section, we can use a direct link that looks like `http://example.com/path/to/page#section-1`. When you load the URL, the browser will automatically jump to the section you want to see. It's that simple!
+
+Many websites now attach IDs to their headings, like this:
+
+```html
+<h2 id="section">...</h2>
+```
+
+We can easily navigate to different sections of a web page by using the target's id attribute, preceded by a `#` character.
+
+```html
+<a href="#section-1">Go to section 1</a>
+```
+
+## :target pseudo-class
+
+Let's dive into the `:target` pseudo-class in CSS. This powerful tool lets you select and style the element that's currently being targeted by the URL's fragment identifier (the part of the URL after the # symbol).
+
+To add some style to the targeted element, simply use the `:target` pseudo-class. For example, you could highlight the background color of the targeted section using this CSS code:
+
+```css
+:target {
+    animation: highlight 3s ease-in-out;
+}
+@keyframes highlight {
+    from {
+        background-color: rgb(253 224 71);
+    }
+    to {
+        background-color: #fff;
+    }
+}
+```
+
+In this example, we'll animate the background color of the selected element. It'll start as `rgb(253 224 71)` and smoothly transition to white over three seconds.
+
+## Usages
+
+Let's take a look at a real-life situation where the highlight animation could come in handy. You can see this example on any Wikipedia page. Every article on Wikipedia (like this [CSS](https://en.wikipedia.org/wiki/CSS) page) typically has many reference notes that provide additional content. When you click on a reference note, also known as a cite note, the page will automatically scroll down to its corresponding reference section.
+
+```html
+<sup id="ref-1" class="reference">
+    <a href="#note-1">[1]</a>
+</sup>
+```
+
+To enhance users' navigation experience, each reference section also includes a link that allows them to jump back to the original citation note.
+
+```html
+<div id="note-1">
+    <a href="#ref-1" title="Jump up">^</a>
+    <!-- Content of the note goes here ... -->
+</div>
+```
+
+In the sample code above, you'll notice that there's a cite note and its reference, and both of them have an `id` attribute.
+
+Check out the demo below, which uses the animation from the previous section to highlight either the reference or the cite node, depending on which one is the current target.
+
+<Playground>
+```css demo.css hidden
+div {
+    margin-bottom: 1rem;
+}
+a {
+    text-decoration: none;
+}
+.note, .reference {
+    font-size: 0.875rem;
+}
+```
+
+```css styles.css
+.note:target,
+.reference:target {
+    animation: highlight 3s ease-in-out;
+}
+@keyframes highlight {
+    from {
+        background-color: rgb(253 224 71);
+    }
+    to {
+        background-color: #fff;
+    }
+}
+```
+
+```html index.html
+<div>
+    Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts. Separated they live in Bookmarksgrove
+    <sup id="ref-1" class="reference"><a class="anchor" href="#note-1">[1]</a></sup>
+    right at the coast of the Semantics, a large language ocean.
+</div>
+<div>
+    The Big Oxmox advised her not to do so, because there were thousands of bad Commas, wild Question Marks and devious Semikoli, but the Little Blind Text
+    <sup id="ref-2" class="reference"><a class="anchor" href="#note-2">[2]</a></sup>
+    didn’t listen. And if she hasn’t been rewritten, then they are still using her. Far far away, behind the word mountains, far from the countries Vokalia and Consonantia, there live the blind texts.
+</div>
+<div>
+    A small river named Duden flows by their place and supplies it with the necessary regelialia. It is a paradisematic country, in which roasted parts of sentences fly into your mouth.
+    Even the all-powerful Pointing has no control about the blind texts it is an almost unorthographic life One day however a small line of blind text by the name of Lorem Ipsum decided to leave for the far World of Grammar.
+</div>
+
+<!-- Notes -->
+<div id="note-1" class="note">
+    [1] <a class="anchor" href="#ref-1" title="Jump up">^</a>
+    When she reached the first hills of the Italic Mountains, she had a last view back on the skyline of her hometown Bookmarksgrove, the headline of Alphabet Village
+</div>
+
+<div id="note-2" class="note">
+    [2] <a class="anchor" href="#ref-2" title="Jump up">^</a>
+    The copy warned the Little Blind Text, that where it came from it would have been rewritten a thousand times and everything that was left from its origin would be the word "and" and the Little Blind Text should turn around and return to its own, safe country.
+</div>
+```
+
+```js scrips.js hidden
+document.addEventListener('DOMContentLoaded', () => {
+    const anchors = document.querySelectorAll('a.anchor');
+    const iframeDocument = document.body.ownerDocument;
+    [...anchors].forEach((anchorEle) => {
+        anchorEle.addEventListener('click', (e) => {
+            e.preventDefault();
+            iframeDocument.location.hash = anchorEle.getAttribute('href').slice(1);
+        });
+    });
+});
+```
+</Playground>
+
+> **A small secret**
+>
+> When you play with the demo above and click on a note and reference, it will scroll to the target, but you won't see the corresponding ID attribute in the browser's address. This happens because the demo lives in its own iframe.
+>
+> The code below is used within the iframe:
+>
+> ```js
+> document.addEventListener('DOMContentLoaded', () => {
+>   const anchors = document.querySelectorAll('a.anchor');
+>   const iframeDocument = document.body.ownerDocument;
+>   [...anchors].forEach((noteEle) => {
+>       anchorEle.addEventListener('click', (e) => {
+>           e.preventDefault();
+>           iframeDocument.location.hash = anchorEle.getAttribute('href').slice(1);
+>       });
+>   });
+> });
+> ```
+>
+> The code sample manages click events for all anchors within an iframe. In the event handler, we prevent the default behavior of scrolling to the target of the outer page, instead of the iframe itself.
+>
+> Additionally, it updates the window's hash that the iframe belongs to, based on the `href` attribute of each anchor.
+>
+> In simple terms, using the `id` attribute, this code allows for navigation inside an iframe to function just like on a regular webpage.
+
+## Keeping a highlighted element until clicking outside of it
+
+If you want to keep an element highlighted until the user clicks outside of it, you'll need a little help from JavaScript. One approach is to handle the click event of the entire page and determine if the user clicks outside of the target element. If they do, you can remove the highlight styles from the target by removing the hash from the URL.
+
+You can check out this feature on GitHub by simply navigating to any comments of a specific issue.
+
+Here's some sample code that demonstrates this approach:
+
+```js
+document.addEventListener('click', (e) => {
+    const clickedEle = e.target;
+
+    // Get the current hash
+    const hash = window.location.hash;
+    if (!hash) {
+        return;
+    }
+
+    const id = hash.slice(1);
+    const targetEle = document.getElementById(id);
+    if (targetEle && !targetEle.contains(clickedEle)) {
+        // Users click outside the target
+        // Update the hash
+        window.location.hash = '';
+    }
+});
+```
+
+In the same code above, we find the `id` attribute from the hash and locate the element that shares the same `id` attribute. If the clicked element is not contained within the target element, meaning that the user has clicked outside of it, we reset the hash to empty.
+This results in the removal of the `:target` styles from the currently highlighted element.
