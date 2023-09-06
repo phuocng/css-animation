@@ -1,0 +1,354 @@
+---
+created: '2023-09-01'
+description: Create a typing indicator using CSS animation
+openGraphCover: /og/css-animation/typing-indicator.png
+title: Typing indicator
+---
+
+In messaging apps and chat interfaces, you might have noticed a little pattern called the tying indicator. It shows when the person you're talking to is typing a message. This can take different forms, from a simple dot-dot-dot to fancier animations or progress bars. The idea is to let you know when to expect a reply and to reassure you that your message has been received and is getting attention.
+
+In this post, we'll explore how to create a typing indicator using CSS animation.
+
+## Markup
+
+The indicator consists of three ellipses, which are empty elements. As a result, the layout can be kept simple with the following structure:
+
+```html index.html
+<div class="container">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+</div>
+```
+
+To make each dot look like a circle, we simply need to set the same value for both the `height` and `width` properties. Additionally, we can set the border radius to 50% of the dimension to achieve the desired effect.
+
+```css styles.css
+.dot {
+    border-radius: 9999px;
+    height: 0.5rem;
+    width: 0.5rem;
+}
+```
+
+To ensure the dots align horizontally and are displayed at the center of the container, we can utilize CSS flexbox styles applied to the container. It's easy to achieve this with just a few lines of code.
+
+```css styles.css
+.container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+}
+```
+
+The `gap` property of a container determines the space between the dots representing its children.
+
+## Blink effect
+
+To indicate to our users that something is in progress, we can create a simple animation that fades in and out a series of dots. First, we'll set the opacity of all the dots to 0 to make them invisible. Then, in the middle of the animation, we'll update the opacity to 1, creating a blink effect.
+
+```css styles.css
+@keyframes blink {
+    50% {
+        opacity: 1;
+    }
+}
+```
+
+We'll run the animation for 1 second and repeat it infinitely.
+
+```css styles.css
+.dot {
+    animation: blink 1s infinite;
+    opacity: 0;
+}
+```
+
+Although we expected a smooth animation, when three dots start and finish animations at the same time, it doesn't look as slick as we would like. One solution is to animate each dot individually, providing users with a better experience.
+
+We'll start by animating the first dot, followed by the second dot once the first one completes its animation. The last dot will then run its animation once the second dot finishes its job.
+
+Luckily, this can be easily achieved in CSS by using the `animation-delay` property. If the overall animation will be played over 1 second, we can delay the animation for each dot accordingly.
+
+```css styles.css
+.dot:nth-child(1) {
+    animation-delay: 0.3333s;
+}
+.dot:nth-child(2) {
+    animation-delay: 0.6666s;
+}
+.dot:nth-child(3) {
+    animation-delay: 0.9999s;
+}
+```
+
+In this example, we use the `:nth-child` selector to select a dot by its corresponding index. For instance, `:nth-child(1)` will select the first dot element, and so on.
+
+Now, the moment has arrived to witness the final result of what we've been working on so far!
+
+<Playground>
+```css demo.css hidden
+.playground__root {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 8rem;
+}
+```
+
+```css styles.css
+.container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+
+    background: rgb(226 232 240);
+    border-radius: 9999px;
+    padding: 1rem;
+}
+.dot {
+    border-radius: 9999px;
+    height: 0.5rem;
+    width: 0.5rem;
+
+    background: rgba(148 163 184 / 1);
+    opacity: 0;
+    animation: blink 1s infinite;
+}
+.dot:nth-child(1) {
+    animation-delay: 0.3333s;
+}
+.dot:nth-child(2) {
+    animation-delay: 0.6666s;
+}
+.dot:nth-child(3) {
+    animation-delay: 0.9999s;
+}
+
+@keyframes blink {
+    50% {
+        opacity: 1;
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+</div>
+```
+</Playground>
+
+
+## Waving effect
+
+In this section, we'll explore a different kind of animation that moves a dot up and down vertically. By running animations for our dots at different points in the timeline, we can make the container look like a sine wave.
+
+To achieve this effect, we can use the `transform` property. The first and last phases won't change the position of each dot. However, in the middle phase, each dot will move up. We'll use the `translateY` function with a negative number to reposition the target element vertically, from bottom to top.
+
+```css styles.css
+@keyframes wave {
+    0% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-0.5rem);
+    }
+    100% {
+        transform: translateY(0px);
+    }
+}
+```
+
+To create a smoother effect, try changing the position and opacity of each phrase in combination, as demonstrated below:
+
+<Playground>
+```css demo.css hidden
+.playground__root {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 8rem;
+}
+```
+
+```css styles.css
+.container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+
+    background: rgb(226 232 240);
+    border-radius: 9999px;
+    padding: 1rem;
+}
+.dot {
+    border-radius: 9999px;
+    height: 0.5rem;
+    width: 0.5rem;
+
+    background: rgba(148 163 184 / 1);
+    animation: wave 1s infinite;
+}
+
+.dot:nth-child(1) {
+    animation-delay: 0.3333s;
+}
+.dot:nth-child(2) {
+    animation-delay: 0.6666s;
+}
+.dot:nth-child(3) {
+    animation-delay: 0.9999s;
+}
+
+@keyframes wave {
+    0% {
+        transform: translateY(0px);
+        background: rgba(148 163 184 / 0);
+    }
+    50% {
+        transform: translateY(-0.5rem);
+        background: rgba(148 163 184 / 0.8);
+    }
+    100% {
+        transform: translateY(0px);
+        background: rgba(148 163 184 / 0);
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+</div>
+```
+</Playground>
+
+## Adding a speech bubble
+
+Lots of messaging and chat apps use speech bubbles as their container design. You can follow the technique outlined in this [post](https://phuoc.ng/collection/css-layout/speech-bubble) to add this shape to your indicator.
+
+Check out this example, which includes two smaller circles in the bottom-left corner of the container.
+
+<Playground>
+```css demo.css hidden
+.playground__root {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    height: 8rem;
+}
+```
+
+```css style.css
+.container {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 0.25rem;
+
+    animation: 2s zoom infinite ease-out;
+    position: relative;
+
+    background: rgb(226 232 240);
+    border-radius: 9999px;
+    padding: 1rem;
+}
+.container::before,
+.container::after {
+    content: '';
+    position: absolute;
+    border-radius: 9999px;
+    background: rgb(226 232 240);
+    bottom: 0;
+    left: 0;
+}
+.container::before {
+    height: 1rem;
+    width: 1rem;
+    transform: translate(-0.125rem, 0.125rem);
+}
+.container::after {
+    height: 0.5rem;
+    width: 0.5rem;
+    transform: translate(-0.5rem, 0.5rem);
+}
+
+.dot {
+    border-radius: 9999px;
+    height: 0.5rem;
+    width: 0.5rem;
+
+    background: rgba(148 163 184 / 1);
+    animation: wave 1s infinite;
+}
+
+.dot:nth-child(1) {
+    animation-delay: 0.3333s;
+}
+.dot:nth-child(2) {
+    animation-delay: 0.6666s;
+}
+.dot:nth-child(3) {
+    animation-delay: 0.9999s;
+}
+
+@keyframes zoom {
+    50% {
+        transform: scale(1.1);
+    }
+}
+
+@keyframes wave {
+    0% {
+        transform: translateY(0px);
+        background: rgba(148 163 184 / 0);
+    }
+    50% {
+        transform: translateY(-0.5rem);
+        background: rgba(148 163 184 / 0.8);
+    }
+    100% {
+        transform: translateY(0px);
+        background: rgba(148 163 184 / 0);
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="dot"></div>
+    <div class="dot"></div>
+    <div class="dot"></div>
+</div>
+```
+</Playground>
+
+In this example, we've created a keyframe called "zoom" which scales up the target using the `scale` function. The target is scaled down to its original size when the animation starts and completes its cycle. Then, in the middle of the animation, the target is scaled up to 110%.
+
+```css style.css
+@keyframes zoom {
+    50% {
+        transform: scale(1.1);
+    }
+}
+```
+
+In addition to the animated dots, the container also zooms in and out using keyframes that last for 2 seconds and have an `ease-out` timing function. This animation runs on an infinite loop.
+
+```css style.css
+.container {
+    animation: 2s zoom infinite ease-out;
+}
+```
+
+## See also
+
+-   [Speech bubble](https://phuoc.ng/collection/css-layout/speech-bubble)
