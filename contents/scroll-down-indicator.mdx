@@ -1,0 +1,170 @@
+---
+created: '2023-09-03'
+description: Create a scroll down indicator in CSS
+openGraphCover: /og/css-animation/scroll-down-indicator.png
+title: Scroll down indicator
+---
+
+When designing a website or application, it's crucial to let users know that there's more content below the fold. This can keep them interested and engaged with your content. One effective way to do this is by adding a scroll down indicator.
+
+In this post, we'll explore how to create a scroll down indicator using CSS. So, let's dive in!
+
+## Markup
+
+To start, we'll create the HTML structure, which consists of two elements: the outer element, which appears at the bottom of the page, and the inner element, which represents the arrow.
+
+```
+<div class="indicator">
+  <div class="arrow"></div>
+</div>
+```
+
+## Styling the indicator
+
+Now let's talk about styling the scroll down indicator. This little guy will always stay at the bottom of the page, no matter where you are on the page. To achieve this, we set the position property to fixed.
+
+To center the indicator horizontally, we combine the `left` and `transform` properties. And for a little extra space between the indicator and the bottom of the page, we use the `bottom` property. Finally, we use the `z-index` property to ensure that the indicator is always on top of other elements.
+
+Here's an example of how your indicator styles could look:
+
+```css
+.indicator {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+
+    z-index: 2;
+}
+```
+
+## Creating the arrow
+
+As mentioned earlier, we'll be using a pure CSS solution to create an arrow within the indicator. But you can choose an SVG or image that matches your design if you prefer.
+
+Instead of using a real element to present an arrow, we'll use the `::before` pseudo-element. Even though it doesn't have actual content, we have to set the `content` property to empty. Otherwise, the pseudo-element will be invisible to users.
+
+```css
+.arrow {
+    position: relative;
+}
+.arrow::before {
+    content: '';
+    position: absolute;
+}
+```
+
+We'll position the element absolutely within the arrow by setting the `position` property to `absolute`. To display it at the center both vertically and horizontally, we can use the same trick we used in the previous section, which combines the `top`, `left`, and `transform` properties. By calling `translate(-50%, -50%)`, we'll shift the arrow to the exact center spot.
+
+```css
+.arrow::before {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+```
+
+Now that we've positioned the arrow, it's time to give it shape with CSS. It's actually pretty easy. We'll just use different border colors for the arrow's sides. Don't forget to set both the `height` and `width` properties to zero, since the arrow shape is created by the borders.
+
+```css
+.arrow::before {
+    border-top: 0.5rem solid rgb(203 213 225);
+    border-right: 0.5rem solid transparent;
+    border-left: 0.5rem solid transparent;
+
+    width: 0;
+    height: 0;
+}
+```
+
+## Adding animation
+
+Let's make it clear to users that they should scroll down by animating the arrow. We'll use the `translateY()` function to move the arrow up and down.
+
+To do this, we'll create a keyframe animation that starts by moving the arrow back to its original position and ends by moving it down a bit (using a position value with the `translateY()` function). We can also adjust the `opacity` property to make the animation smoother.
+
+```css
+@keyframes scroll-down {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0.5rem);
+        opacity: 0;
+    }
+}
+```
+
+Finally, we'll run the animation on the arrow for 2 seconds and repeat it infinitely.
+
+```css
+.arrow {
+    animation: scroll-down 2s infinite;
+}
+```
+
+Now, it's time to see the final result of all the steps we've taken so far.
+
+<Playground>
+```css demo.css hidden
+body {
+    height: 16rem;
+}
+```
+
+```css styles.css
+.indicator {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+
+    z-index: 2;
+}
+.arrow {
+    border: 1px solid rgb(203 213 225);
+    height: 2rem;
+    width: 2rem;
+    border-radius: 50%;
+
+    position: relative;
+    animation: scroll-down 2s infinite;
+}
+.arrow::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+
+    border-top: 0.5rem solid rgb(203 213 225);
+    border-right: 0.5rem solid transparent;
+    border-left: 0.5rem solid transparent;
+
+    width: 0;
+    height: 0;
+}
+
+@keyframes scroll-down {
+    0% {
+        transform: translateY(0);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(0.5rem);
+        opacity: 0;
+    }
+}
+```
+
+```html index.html
+<div class="indicator">
+    <div class="arrow"></div>
+</div>
+```
+</Playground>
+
+## See also
+
+-   [Triangle buttons](https://phuoc.ng/collection/css-layout/triangle-buttons)
