@@ -1,0 +1,442 @@
+---
+created: '2023-09-03'
+description: Create different hamburger menu animations in CSS
+openGraphCover: /og/css-animation/hamburger-menu.png
+title: Hamburger menu
+---
+
+If you've ever seen three lines stacked on top of each other while browsing the web, then you've encountered a hamburger menu. It's a popular design element used in mobile and responsive web design to save space and create a clean, minimalist interface.
+
+When clicked, this little menu slides out from either side of the screen, revealing a list of navigation items or options. The hamburger menu also transforms into an "X" or some other shapes when the menu is opened.
+
+In this post, we'll show you how to create different hamburger menu animations in CSS. Let's dive in!
+
+## Creating a hamburger menu
+
+To create a hamburger menu, we first need to create the HTML markup. This will consist of a button element with three nested div elements, each representing a line of the hamburger icon.
+
+```html
+<button class="hamburger">
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+</button>
+```
+
+Next, we'll add some basic styles to our elements. We'll remove any default styles from the button element, including the background and border colors.&#x20;
+
+```css
+.hamburger {
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+```
+
+Then, for each line element, we'll set the background color, height, width, and spacing between consecutive lines.
+
+```css
+.hamburger__line {
+    background: rgb(203 213 225);
+    margin: 0.25rem 0;
+    height: 0.25rem;
+    width: 2rem;
+}
+```
+
+## Forming a X shape
+
+It's the time to create a cool hamburger menu animation using CSS. When the user hovers over the button, we want the lines to transform into an "X" shape.
+
+To make this happen, we'll use the `:hover` pseudo-class and the `nth-child` selector to access each line. We'll use the `translate()` and `rotate()` functions to transform the lines into the X shape.
+
+The first line will move down in the y-axis and rotate 45 degrees to create one line of the X shape. The second line will disappear by setting its opacity to zero. The last line will move up in the y-axis and rotate 45 degrees in the counterclockwise direction to finish the X shape. We'll transform it in the opposite direction to the first line by using negative values in both `translate()` and `rotate()` functions.
+
+```css
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+.hamburger:hover .hamburger__line:nth-child(2) {
+    opacity: 0;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+```
+
+To apply the transformation, we'll use the `transition` property. The animation will run for 300 milliseconds (0.3s) using the `ease-out` timing function. The `all` value indicates that any style changes will be animated, including the `transform` and `opacity` properties.
+
+```css
+.hamburger__line {
+    transition: all 0.3s ease-out;
+}
+```
+
+Give it a try by hovering your mouse over the button. Check it out!
+
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.hamburger {
+    /* Reset */
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+.hamburger__line {
+    background: rgb(203 213 225);
+    margin: 5px 0;
+    height: 4px;
+    width: 32px;
+
+    transition: all 0.3s ease-out;
+}
+
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translateY(9px) rotate(45deg);
+}
+.hamburger:hover .hamburger__line:nth-child(2) {
+    opacity: 0;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translateY(-9px) rotate(-45deg);
+}
+```
+
+```html index.html
+<button class="hamburger">
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+</button>
+```
+</Playground>
+
+## Forming a minus sign
+
+In this approach, we'll turn a button into a minus sign when it's hovered over. We'll be using the same transformation as the previous approach, but we won't rotate the first and last lines.
+
+Instead, we'll move the first line down in the y-axis until it reaches the second line. The second line will move up until it reaches the first line. The second line will then turn off visibility, just like in the previous approach.
+
+The `transform` property of the first and last lines will be the same as in the previous approach, except we won't use the `rotate()` function anymore.
+
+```css
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translateY(9px);
+}
+.hamburger:hover .hamburger__line:nth-child(2) {
+    opacity: 0;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translateY(-9px);
+}
+```
+
+Check out how it looks!
+
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.hamburger {
+    /* Reset */
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+.hamburger__line {
+    background: rgb(203 213 225);
+    margin: 5px 0;
+    height: 4px;
+    width: 32px;
+
+    transition: all 0.3s ease-out;
+}
+
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translateY(9px);
+}
+.hamburger:hover .hamburger__line:nth-child(2) {
+    opacity: 0;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translateY(-9px);
+}
+```
+
+```html index.html
+<button class="hamburger">
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+</button>
+```
+</Playground>
+
+To turn the button into a minus sign, we can use another effect that moves the first and last lines out of the button horizontally. We'll use the `translateX()` function to indicate that the position has changed only in the x-axis. With `translateX(-100%)`, we can move the target out of the container from left to right, and with `translateX(100%)`, we can do the opposite.
+
+Both transformations set the `opacity` property to zero, making the first and last lines invisible. As a result, only the second line remains visible once the animation is complete.
+
+```css
+.hamburger:hover .hamburger__line:nth-child(1) {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    opacity: 0;
+    transform: translateX(100%);
+}
+```
+
+Check out how this can reproduce a minus sign.
+
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.hamburger {
+    /* Reset */
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+.hamburger__line {
+    background: rgb(203 213 225);
+    margin: 5px 0;
+    height: 4px;
+    width: 32px;
+
+    transition: all 0.3s ease-out;
+}
+
+.hamburger:hover .hamburger__line:nth-child(1) {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    opacity: 0;
+    transform: translateX(100%);
+}
+```
+
+```html index.html
+<button class="hamburger">
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+</button>
+```
+</Playground>
+
+## Forming a plus sign
+
+In this section, we're going to show you another type of transformation. When a user hovers over a button, it turns into a plus sign. To achieve this effect, we move the first line down until it meets the second line, creating a horizontal line.
+
+Then, we move the last line on the y-axis and rotate it 90 degrees counterclockwise, forming the vertical line of the plus sign. Finally, we adjust the `opacity` of the second line to make it invisible after the animation.
+
+```css
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translateY(9px);
+}
+.hamburger:hover .hamburger__line:nth-child(2) {
+    opacity: 0;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translateY(-9px) rotate(-90deg);
+}
+```
+
+Check out the demo below to see this approach in action.
+
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.hamburger {
+    /* Reset */
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+.hamburger__line {
+    background: rgb(203 213 225);
+    margin: 5px 0;
+    height: 4px;
+    width: 32px;
+
+    transition: all 0.3s ease-out;
+}
+
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translateY(9px);
+}
+.hamburger:hover .hamburger__line:nth-child(2) {
+    opacity: 0;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translateY(-9px) rotate(-90deg);
+}
+```
+
+```html index.html
+<button class="hamburger">
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+</button>
+```
+</Playground>
+
+## Forming an arrow
+
+To create the arrow on the button, we use a simple transformation technique. The first line is rotated by 45 degrees and moved along the x and y-axis until it meets the first point of the second line, forming the top line of the arrow. We then reduce the width of the first line to give it a sleeker look. The same transformation is applied to the last line to create the bottom line of the arrow.
+
+If you need to adjust the arrow's position, feel free to tweak the values passed to the `translate()` function.
+
+```css
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translate(-2px, 4px) rotate(-45deg);
+    width: 16px;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translate(-2px, -4px) rotate(45deg);
+    width: 16px;
+}
+```
+
+This is how the arrow looks when you hover your mouse over the button:
+
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.hamburger {
+    /* Reset */
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+.hamburger__line {
+    background: rgb(203 213 225);
+    margin: 5px 0;
+    height: 4px;
+    width: 32px;
+
+    transition: all 0.3s ease-out;
+}
+
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translate(-2px, 4px) rotate(-45deg);
+    width: 16px;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translate(-2px, -4px) rotate(45deg);
+    width: 16px;
+}
+```
+
+```html index.html
+<button class="hamburger">
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+</button>
+```
+</Playground>
+
+To change the direction of the arrow, adjust the parameters of the `translate()` function. This will ensure that the first and last lines reach the end of the second line, and the arrow will be rotated in the opposite direction.&#x20;
+
+```css
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translate(17px, 4px) rotate(45deg);
+    width: 16px;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translate(17px, -4px) rotate(-45deg);
+    width: 16px;
+}
+```
+
+Take a look at the demo to see it in action.
+
+<Playground>
+```css demo.css hidden
+body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.hamburger {
+    /* Reset */
+    background: transparent;
+    border: transparent;
+    cursor: pointer;
+    padding: 0;
+}
+.hamburger__line {
+    background: rgb(203 213 225);
+    margin: 5px 0;
+    height: 4px;
+    width: 32px;
+
+    transition: all 0.3s ease-out;
+}
+
+.hamburger:hover .hamburger__line:nth-child(1) {
+    transform: translate(17px, 4px) rotate(45deg);
+    width: 16px;
+}
+.hamburger:hover .hamburger__line:nth-child(3) {
+    transform: translate(17px, -4px) rotate(-45deg);
+    width: 16px;
+}
+```
+
+```html index.html
+<button class="hamburger">
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+    <div class="hamburger__line"></div>
+</button>
+```
+</Playground>
