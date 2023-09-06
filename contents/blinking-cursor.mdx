@@ -1,0 +1,117 @@
+---
+created: '2023-09-03'
+description: Create blinking cursor animation in CSS
+openGraphCover: /og/css-animation/blinking-cursor.png
+title: Blinking cursor
+---
+
+The blinking cursor animation is a neat trick that makes the text cursor appear and disappear at regular intervals.
+
+You've probably seen this effect in text editors, where it shows where new text will appear when you start typing. But that's not the only place it's used! You'll also find it in search bars, where it lets you know you can start typing your question. And in login forms, it tells you which field is ready for your input.
+
+In this post, we'll explore some simple and common ways to create a blinking cursor animation using CSS.
+
+## Markup
+
+To add a caret to your webpage, start by creating an HTML element where you want the caret to appear. For instance, you could make a div element with a class of `caret`.
+
+```html
+<div class="caret"></div>
+```
+
+The caret should have some basic styles that determine its dimensions, like height and width. Additionally, it should have a dark background color to resemble a real caret.
+
+```css
+.cursor {
+    background-color: rgb(15 23 42);
+    width: 0.25rem;
+    height: 2rem;
+}
+```
+
+## Blinking animation
+
+There are two common ways to make the caret blink. The first approach is to change the background color repeatedly, back and forth between the original and transparent colors.
+
+It involves creating a blink keyframe to define the animation. This approach keeps the original color in the middle of the animation, but uses a transparent background color at the start and end, making the caret appear invisible.
+
+```css
+@keyframes blink {
+    0%, 100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(15 23 42);
+    }
+}
+```
+
+The animation lasts one second and repeats infinitely.
+
+```css
+.cursor {
+    animation: blink 1s infinite;
+}
+```
+
+Now, let's see an example of how this approach works in action.
+
+<Playground>
+```css styles.css
+.cursor {
+    background-color: rgb(15 23 42);
+    width: 0.25rem;
+    height: 2rem;
+
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(15 23 42);
+    }
+}
+```
+
+```html index.html
+<div class="cursor"></div>
+```
+</Playground>
+
+Another approach to create a blinking effect is to change the `opacity` property instead of the background color. This animation starts at 100% opacity (fully visible) and ends at 0% opacity (fully invisible), then repeats.
+
+By repeatedly changing the opacity, you can achieve the blinking effect you're looking for.
+
+Let's take a look at the example below to see how this approach works.
+
+<Playground>
+```css styles.css
+.cursor {
+    background-color: rgb(15 23 42);
+    width: 0.25rem;
+    height: 2rem;
+
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+```
+
+```html index.html
+<div class="cursor"></div>
+```
+</Playground>
+
+## See also
+
+-   [Typewriter](https://phuoc.ng/collection/css-animation/typewriter)
