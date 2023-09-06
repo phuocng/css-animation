@@ -1,0 +1,509 @@
+---
+created: '2023-09-04'
+description: Create a typewriter effect
+openGraphCover: /og/css-animation/typewriter.png
+title: Typewriter
+---
+
+The typewriter effect is a cool animation that makes text appear as if it's being typed on a page. It's a great way to add some pizzazz to your website and keep your visitors engaged.
+
+There are tons of ways to use the typewriter effect to enhance your website's design and user experience. For instance, you can use it to introduce key concepts or features on your homepage, or to emphasize important text throughout your site.
+
+In this post, we'll explore different ways to create a typewriter effect using pure CSS or JavaScript-based solutions. For demonstration purposes, we'll be using the following quotes.
+
+-   Learning never exhausts the mind — *Leonardo da Vinci*
+-   You teach best what you most need to learn — *Richard Bach*
+-   In youth we learn; in age we understand — *Marie von Ebner-Eschenbach*
+
+## Markup
+
+To get started with the typewriter effect, you'll need to create the HTML structure first. This layout has two basic elements: the container and the inner element. The outer element, which will have styles added later, holds everything together. The inner element is where the text will be displayed.
+
+```html
+<div class="container">
+  <div class="typewriter"></div>
+</div>
+```
+
+## Using the steps() function
+
+There are two approaches to creating a typewriter effect using CSS and JavaScript. The first approach is a CSS-only solution, which relies solely on CSS animation, without using any JavaScript code.
+
+To create the typewriter effect, we increase the width of the inner element from 0% to 100% using a keyframe called `typing` which modifies the `width` property.
+
+```css
+@keyframes typing {
+    from {
+        width: 0%;
+    }
+    to {
+        width: 100%;
+    }
+}
+```
+
+We start with 0% width, meaning that no characters are typed. At the end of the animation, the element width is set to its original, full width, meaning that all characters are typed completely.
+
+The challenge is to indicate that, at each step of the animation duration timeline, a single character appears in the correct order from left to right. Fortunately, CSS provides the `step()` timing function for that purpose. We pass the number of steps to the function, and the animation performs the corresponding total of steps.
+
+In our example, the total number of steps is the same as the total number of characters. If we use the effect for the quote `Learning never exhausts the mind`, then the number of steps is 48.
+
+```js
+console.log('Learning never exhausts the mind'.length); // 48
+```
+
+The animation declaration could look like this:&#x20;
+
+```css
+.typewritter {
+    animation: typing 4s steps(48);
+}
+```
+
+It runs the typing animation over a duration of 4 seconds, in 48 equal steps. The animation constantly updates the width, so we need to add some additional styles to the inner element to ensure that the content doesn't overflow.
+
+```css
+.container {
+    width: fit-content;
+}
+.typewritter {
+    overflow: hidden;
+    white-space: nowrap;
+}
+```
+
+### Blinking the cursor
+
+To make the effect of typing even more realistic, we want to add a blinking cursor at the end of the text. There are a few ways to do this, but in this approach, we can use the right border of the text element instead of creating a new element just for the cursor.
+
+First, we make the right border of the text transparent. Then, we animate the color of the border to a darker shade at the end of the animation to create the blinking effect.
+
+```css
+.typewritter {
+    border-right: 4px solid transparent;
+}
+@keyframes blink {
+    from {
+        border-right-color: transparent;
+    }
+    to {
+        border-right-color: rgb(15 23 42);
+    }
+}
+```
+
+Now is the perfect time to combine animations with text using CSS. It's easy as pie! Simply separate the animations with commas.
+
+For example, in the code below, the text element runs two animations simultaneously. The first animation creates a typing effect that lasts for 4 seconds. The second animation creates a blinking cursor that fades in and out repeatedly.
+
+```css
+.typewritter {
+    animation: typing 4s steps(48), blink 1s infinite;
+}
+```
+
+Let's review the progress of the steps we've taken so far.
+
+<Playground>
+```css styles.css
+.container {
+    width: fit-content;
+}
+.typewritter {
+    border-right: 4px solid transparent;
+    font-size: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+
+    animation: typing 4s steps(48), blink 1s infinite;
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+@keyframes blink {
+    from {
+        border-right-color: transparent;
+    }
+    to {
+        border-right-color: rgb(15 23 42);
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="typewritter">Learning never exhausts the mind</div>
+</div>
+```
+</Playground>
+
+To make the cursor more customizable, you'll need to create a new element for it. We'll call it the cursor element and add it to the container.
+
+```html
+<div class="container">
+    <div class="typewritter">Learning never exhausts the mind</div>
+    <div class="cursor">|</div>
+</div>
+```
+
+Since the text and cursor elements are aligned horizontally, we'll use CSS flexbox for the container.
+
+```css
+.container {
+    display: flex;
+    align-items: center;
+}
+```
+
+To create the blinking effect, you can change the background color of the cursor over time. The animation runs on the cursor element, not the text element as in the previous section. Keep in mind that the cursor has a transparent text color, so the `|` character is invisible.
+
+```css
+.cursor {
+    background-color: rgb(15 23 42);
+    color: transparent;
+    width: 4px;
+
+    animation: blink 1s infinite;
+}
+@keyframes blink {
+    0%, 100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(15 23 42);
+    }
+}
+```
+
+Check out these animations in action:
+
+<Playground>
+```css styles.css
+.container {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+}
+.typewritter {
+    font-size: 1.5rem;
+    white-space: nowrap;
+    overflow: hidden;
+    animation: typing 4s steps(48);
+    padding-right: 0.25rem;
+}
+.cursor {
+    background-color: rgb(15 23 42);
+    color: transparent;
+    width: 4px;
+
+    animation: blink 1s infinite;
+}
+
+@keyframes typing {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+@keyframes blink {
+    0%, 100% {
+        background-color: transparent;
+    }
+    50% {
+        background-color: rgb(15 23 42);
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="typewritter">Learning never exhausts the mind</div>
+    <div class="cursor">|</div>
+</div>
+```
+</Playground>
+
+While the `steps()` function can create a smooth animation, it does have a downside - we need to know the total number of steps beforehand. This means that if we want to animate different text, we have to update the CSS code, which makes the code less reusable.
+
+Unfortunately, this approach doesn't work with dynamic text. To solve this issue, let's move on to the next section.
+
+## Updating text dynamically
+
+In this section, we'll explore another approach to updating text dynamically using JavaScript. By using the `setTimeout()` function and a little bit of code, we can display one character at a time.
+
+To achieve this effect, we'll define a function called `type` that is called every 100 milliseconds. The function checks if the last character has been displayed, and if not, it displays the next character.
+
+The `type` function uses a variable called `charIndex` to track the index of the last displayed character. We then check if this index is less than the length of the text. If it is, we display the next character using the `charAt()` function and increase the index by one.
+
+```javascript
+const content = 'Learning never exhausts the mind';
+const textEle = document.getElementById('text');
+
+let charIndex = 0;
+const type = () => {
+    if (charIndex < content.length) {
+        textEle.textContent += content.charAt(charIndex);
+        charIndex++;
+        setTimeout(type, 100);
+    }
+};
+```
+
+To begin the effect, simply call the `type` function.
+
+```js
+type();
+```
+
+In reality, the cursor only blinks when we stop typing. But we can change that by moving the blinking animation to a separate class.
+
+```css
+.cursor__blink {
+    animation: blink 1s infinite;
+}
+```
+
+This class will be added or removed from the cursor element depending on whether the text has been fully displayed or not.
+
+To make this happen, we can add some logic to the `type()` function. In the following example, we'll dynamically manage the blinking class by using the `remove()` and `add()` functions.
+
+```js
+const cursorEle = document.getElementById('cursor');
+
+const type = () => {
+    if (charIndex < content.length) {
+        cursorEle.classList.remove('cursor__blink');
+        // ...
+    } else {
+        cursorEle.classList.add('cursor__blink');
+    }
+};
+```
+
+Now, let's dive into how it all works, shall we?
+
+<Playground>
+```css styles.css
+.container {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+}
+.typewritter {
+    font-size: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+    padding-right: 0.25rem;
+}
+.cursor {
+    background-color: rgb(15 23 42);
+    color: transparent;
+    width: 4px;
+}
+.cursor__blink {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        background-color: rgb(15 23 42);
+    }
+    50% {
+        background-color: transparent;
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="typewritter" id="text"></div>
+    <div class="cursor" id="cursor">|</div>
+</div>
+```
+
+```js scripts.js
+document.addEventListener("DOMContentLoaded", () => {
+    const content = 'Learning never exhausts the mind';
+    const textEle = document.getElementById('text');
+    const cursorEle = document.getElementById('cursor');
+    let charIndex = 0;
+
+    const type = () => {
+        if (charIndex < content.length) {
+            cursorEle.classList.remove('cursor__blink');
+            textEle.textContent += content.charAt(charIndex);
+            charIndex++;
+            setTimeout(type, 120);
+        } else {
+            cursorEle.classList.add('cursor__blink');
+        }
+    };
+
+    type();
+});
+```
+</Playground>
+
+## Multiple texts
+
+Let's take our example to the next level and add support for multiple texts. To do this, we need to create a new function that simulates the *Backspace* key and erases text.
+
+We'll call this function `erase()`. It will work the opposite way to the `type()` function. It will remove the last character from the text element and decrease the index by 1 until all characters are removed. The `cursor__blink` class will be added or removed from the cursor element accordingly.
+
+```js
+const erase = () => {
+    if (charIndex > 0) {
+        cursorEle.classList.remove('cursor__blink');
+        textEle.textContent = textEle.textContent.slice(0, charIndex - 1);
+        charIndex--;
+        setTimeout(erase, 100);
+    } else {
+        cursorEle.classList.add('cursor__blink');
+    }
+};
+```
+
+To keep track of the current text we're working on, we'll need a new index called `arrayIndex` to access the list of texts. The `type()` function will be updated so that we're working with the current text. When the current text is fully displayed, we'll start erasing it after 500 milliseconds.
+
+```js
+const texts = [
+    'Learning never exhausts the mind',
+    'You teach best what you most need to learn',
+    'In youth we learn; in age we understand',
+];
+let arrayIndex = 0;
+
+const type = () => {
+    if (charIndex < texts[arrayIndex].length) {
+        cursorEle.classList.remove('cursor__blink');
+        textEle.textContent += texts[arrayIndex].charAt(charIndex);
+        charIndex++;
+        setTimeout(type, 100);
+    } else {
+        cursorEle.classList.add('cursor__blink');
+        setTimeout(erase, 500);
+    }
+};
+```
+
+In the same way, once the current text has been wiped clean, we'll wait 500 milliseconds before typing the next one. Here's an example of what the `erase` function might look like:
+
+```js
+const erase = () => {
+    if (charIndex > 0) {
+        cursorEle.classList.remove('cursor__blink');
+        textEle.textContent = textEle.textContent.slice(0, charIndex - 1);
+        charIndex--;
+        setTimeout(erase, 100);
+    } else {
+        cursorEle.classList.add('cursor__blink');
+        arrayIndex++;
+        if (arrayIndex > texts.length - 1) {
+            arrayIndex = 0;
+        }
+        setTimeout(type, 500);
+    }
+};
+```
+
+Now, it's time to see the final demonstration!
+
+<Playground>
+```css styles.css
+.container {
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    height: 2.5rem;
+}
+.typewritter {
+    font-size: 1.5rem;
+    overflow: hidden;
+    white-space: nowrap;
+}
+.cursor {
+    background-color: rgb(15 23 42);
+    color: transparent;
+    width: 4px;
+}
+.cursor__blink {
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 100% {
+        background-color: rgb(15 23 42);
+    }
+    50% {
+        background-color: transparent;
+    }
+}
+```
+
+```html index.html
+<div class="container">
+    <div class="typewritter" id="text"></div>
+    <div class="cursor" id="cursor">|</div>
+</div>
+```
+
+```js scripts.js
+document.addEventListener("DOMContentLoaded", () => {
+    const texts = [
+        'Learning never exhausts the mind',
+        'You teach best what you most need to learn',
+        'In youth we learn; in age we understand',
+    ];
+
+    const textEle = document.getElementById('text');
+    const cursorEle = document.getElementById('cursor');
+    const content = textEle.textContent;
+
+    let charIndex = 0;
+    let arrayIndex = 0;
+
+    const erase = () => {
+        if (charIndex > 0) {
+            cursorEle.classList.remove('cursor__blink');
+            textEle.textContent = textEle.textContent.slice(0, charIndex - 1);
+            charIndex--;
+            setTimeout(erase, 100);
+        } else {
+            cursorEle.classList.add('cursor__blink');
+            arrayIndex++;
+            if (arrayIndex > texts.length - 1) {
+                arrayIndex = 0;
+            }
+            setTimeout(type, 500);
+        }
+    };
+
+    const type = () => {
+        if (charIndex < texts[arrayIndex].length) {
+            cursorEle.classList.remove('cursor__blink');
+            textEle.textContent += texts[arrayIndex].charAt(charIndex);
+            charIndex++;
+            setTimeout(type, 100);
+        } else {
+            cursorEle.classList.add('cursor__blink');
+            setTimeout(erase, 500);
+        }
+    };
+
+    type();
+});
+```
+</Playground>
+
+## See also
+
+-   [Blinking cursor](https://phuoc.ng/collection/css-animation/blinking-cursor)
