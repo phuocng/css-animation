@@ -1,0 +1,346 @@
+---
+created: '2023-09-22'
+description: Make an element take up the entire page with JavaScript
+openGraphCover: /og/css-animation/make-element-take-entire-page.png
+title: Make an element take up the entire page
+---
+
+Sometimes we want users to focus on a specific element that takes up the entire page. For example, when displaying code results, it's helpful to allow users to view the output without any distractions from the implementation details. As you can see, the playground in this post offers similar functionality.
+
+Another example is when we allow users to click on an image to see it in full-page mode. This has some benefits. First, it allows the user to see the image at its maximum size, which makes it easier to appreciate and examine details that might not be visible otherwise. Second, viewing an image in full-page mode often removes any visual distractions from the surrounding page, allowing the user to focus solely on the image itself. This can be especially useful for images that include text or other important information, as it ensures that the user can see all of the details clearly and without interruption.
+
+In this post, we'll learn how to implement this functionality using JavaScript. Let's dive in!
+
+## HTML markup
+
+The layout has two elements: an outer element that we want to view in full page, and an inner element which is a button that triggers the full page view.
+
+```html
+<div id="container" class="container">
+    <button id="view-full-page">Full page</button>
+</div>
+```
+
+## Viewing in full-page mode
+
+When users click the button, the container element will take up the whole page. To make this happen, we need to handle the `click` event of the button.
+
+Inside the handler, we can add the `full-page` class to the target element. This class will set the position of the element to fixed and its width and height to 100%, so that it takes up the entire page. We also update the text of the button to say *Close* when in full-page mode so that users can easily exit out of full-page view.
+
+Here's an example of what `full-page` class and the event handler could look like:
+
+```css
+.full-page {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+```
+
+```js
+const containerEle = document.getElementById('container');
+const viewFullPageButton = document.getElementById('view-full-page');
+
+viewFullPageButton.addEventListener('click', () => {
+    containerEle.classList.add('full-page');
+    viewFullPageButton.innerHTML = 'Close';
+});
+```
+
+However, once the target element is in full-page mode, clicking the button should remove the `full-page` class and revert the label to its original value.
+
+To make this happen, we need to update the event handler. We can check whether the target element is in full page mode by seeing if it has the `full-page` class. If it does, we remove the class and change the button label back to its original text.
+
+Here's an example of what the updated event handler could look like:
+
+```js
+viewFullPageButton.addEventListener('click', () => {
+    const isFullPage = containerEle.classList.contains('full-page');
+    if (isFullPage) {
+        containerEle.classList.remove('full-page');
+        viewFullPageButton.innerHTML = 'Full page';
+    } else {
+        containerEle.classList.add('full-page');
+        viewFullPageButton.innerHTML = 'Close';
+    }
+});
+```
+
+## Adding animation to full-page mode
+
+Let's spice up our full-page mode by adding some animation. This will not only make it look cooler but also improve the user experience by clearly indicating that the element is now in full-page mode.
+
+To make this happen, we can use CSS animations. Here's how:
+
+```css
+.container {
+    transition: width 0.3s, height 0.3s;
+}
+```
+
+In our case, we're animating the container element as it switches to full-page mode. By transitioning the `width` and `height` properties over 0.3 seconds, we create a smooth animation that lets users know something has changed on the page.
+
+However, you might notice that the layout breaks as soon as the element changes dimensions. Don't worry, we'll fix this issue in the next section. For now, give the demo a try and see for yourself how adding animation can make a big difference.
+
+<Playground>
+```css demo.css hidden
+button {
+    background: none;
+    border: 1px solid rgb(129 140 248);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    height: 2rem;
+    padding: 0 0.5rem;
+}
+.container {
+    border: 2px dashed rgb(203 213 225);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    width: 16rem;
+    transition: width 0.3s, height 0.3s;
+}
+```
+
+```css styles.css
+.full-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    z-index: 9999;
+}
+```
+
+```html index.html
+<p class="playground__placeholder">
+    Fill gathered waters, divide also fruit. Grass multiply air behold also our which Air light said behold given you're over. Living fourth signs land to light moving us upon creature seasons was place years abundantly saying days shall Rule greater seed winged for created.
+</p>
+
+<div id="container" class="container">
+    <p class="playground__placeholder">
+        Seas without earth Face were sea. Replenish moveth, that female him waters gathering deep face so divide image us light kind void their let god from divide they're wherein given, lesser our all for fish light. Given hath morning sea deep divide. Had lights under divided winged open good, thing darkness. Third their. Face, them it fourth. Bearing male also days dry god upon he.
+    </p>
+    <button id="view-full-page">Full page</button>
+</div>
+
+<p class="playground__placeholder">
+    Rule one Place two two forth great fruit bearing without of seasons created multiply place moveth fly it. Make i bring great, also be replenish. Also abundantly gathering creeping lesser appear she'd it there waters brought waters hath. Multiply, fowl darkness. Saying signs. Day there appear own replenish years make. Land, us brought it own third sea. From doesn't you're every for days under gathering fill subdue whales every over won't have firmament spirit midst fruit. Itself whales bring the kind face greater Darkness his don't. Lights moved spirit let divided.
+</p>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const containerEle = document.getElementById('container');
+    const viewFullPageButton = document.getElementById('view-full-page');
+
+    viewFullPageButton.addEventListener('click', () => {
+        const isFullPage = containerEle.classList.contains('full-page');
+        if (isFullPage) {
+            containerEle.classList.remove('full-page');
+            viewFullPageButton.innerHTML = 'Full page';
+        } else {
+            containerEle.classList.add('full-page');
+            viewFullPageButton.innerHTML = 'Close';
+        }
+    });
+});
+```
+</Playground>
+
+## Fixing broken layout issue
+
+To fix the layout issue mentioned earlier, we'll create a placeholder that has the same content and position as the original target element. We'll use the `cloneElement()` function to create a copy of the target element, ensuring that all the children of the target element are also cloned in the new element. To keep the copied element hidden, we'll set the `visibility` property to `hidden`. Finally, we'll insert the cloned element right after the original element using the `insertAdjacentElement()` function.
+
+```js
+const clonedEle = containerEle.cloneNode(true);
+clonedEle.removeAttribute('id');
+clonedEle.style.visibility = 'hidden';
+containerEle.insertAdjacentElement('afterend', clonedEle);
+```
+
+Once the placeholder is in place, we'll animate the original element using JavaScript. Rather than using the CSS animation mentioned earlier, we'll use JavaScript to transition the target element from its original position to a full-page position.
+
+We're going to make a quick change to the `.full-page` class by removing the `top` and `left` properties:
+
+```css
+.full-page {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    z-index: 9999;
+}
+```
+
+To calculate the original position, we'll use the `getBoundingClientRect()` function to determine the bounding rectangle of the target element and retrieve the `top` and `left` properties from the result.
+
+```js
+const rect = containerEle.getBoundingClientRect();
+containerEle.style.top = `${rect.top}px`;
+containerEle.style.left = `${rect.left}px`;
+```
+
+Now we can animate the target element from its original position to the full-page mode position by calling the `animate()` function. This built-in JavaScript method allows us to create animations on HTML elements. We'll define an array with only one element that describes the final state of the animation. The object passed as an argument specifies how long the animation should last and what type of easing should be used.
+
+By setting the `fill` property to `forwards`, we ensure that the target element retains its final state even after the animation is complete.
+
+This is how we animate the target element:
+
+```js
+containerEle.animate([{
+    top: 0,
+    left: 0,
+}], {
+    duration: 300,
+    easing: 'ease-in-out',
+    fill: 'forwards',
+});
+```
+
+## Removing the cloned element when exiting full-page mode
+
+When users exit full-page mode, we need to remove any cloned elements that were created and reset the styles for the container element. To accomplish this, we can use the JavaScript Animation API's `finish` event, which is triggered when an animation completes its job.
+
+First, we determine the original position of the target element by using the cloned element and then use the `animate()` function to animate the target element from the full-page mode back to its original position.
+
+```js
+const rect = clonedEle.getBoundingClientRect();
+const collapseAnimation = containerEle.animate([{
+    top: `${rect.top}px`,
+    left: `${rect.left}px`,
+}], {
+    duration: 300,
+    easing: 'ease-in-out',
+    //fill: 'forwards',
+});
+```
+
+Once the animation is complete, we handle the `finish` event to remove the cloned element and reset any styles applied to indicate the position, such as `position`, `top`, and `left` properties.
+
+Here's an example of how we can handle the `finish` event:
+
+```js
+collapseAnimation.addEventListener('finish', () => {
+    clonedEle.remove();
+    containerEle.style.removeProperty('position');
+    containerEle.style.removeProperty('top');
+    containerEle.style.removeProperty('left');
+});
+```
+
+By removing the cloned element and resetting the styles for the container element, we can ensure that our page functions as expected and that there are no leftover elements or styles after exiting full-page mode.
+
+Finally, let's check out the latest demo of the steps we've taken so far.
+
+> **Note**
+>
+> It's important to note that the demo is contained within an iframe, so you may have noticed that the sample code uses the `position: absolute` declaration for the full-page mode. However, in reality, you'll need to change it to `position: fixed`.
+
+<Playground>
+```css demo.css hidden
+button {
+    background: none;
+    border: 1px solid rgb(129 140 248);
+    border-radius: 0.25rem;
+    cursor: pointer;
+    height: 2rem;
+    padding: 0 0.5rem;
+}
+.container {
+    border: 2px dashed rgb(203 213 225);
+    border-radius: 0.5rem;
+    padding: 1rem;
+    width: 16rem;
+    transition: width 0.3s, height 0.3s;
+}
+```
+
+```css styles.css
+.full-page {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    background: #fff;
+    z-index: 9999;
+}
+```
+
+```html index.html
+<p class="playground__placeholder">
+    Fill gathered waters, divide also fruit. Grass multiply air behold also our which Air light said behold given you're over. Living fourth signs land to light moving us upon creature seasons was place years abundantly saying days shall Rule greater seed winged for created.
+</p>
+
+<div id="container" class="container">
+    <p class="playground__placeholder">
+        Seas without earth Face were sea. Replenish moveth, that female him waters gathering deep face so divide image us light kind void their let god from divide they're wherein given, lesser our all for fish light. Given hath morning sea deep divide. Had lights under divided winged open good, thing darkness.
+    </p>
+    <button id="view-full-page">Full page</button>
+</div>
+
+<p class="playground__placeholder">
+    Rule one Place two two forth great fruit bearing without of seasons created multiply place moveth fly it. Make i bring great, also be replenish. Also abundantly gathering creeping lesser appear she'd it there waters brought waters hath. Multiply, fowl darkness. Saying signs. Day there appear own replenish years make. Land, us brought it own third sea. From doesn't you're every for days under gathering fill subdue whales every over won't have firmament spirit midst fruit. Itself whales bring the kind face greater Darkness his don't. Lights moved spirit let divided.
+</p>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const containerEle = document.getElementById('container');
+    const viewFullPageButton = document.getElementById('view-full-page');
+
+    viewFullPageButton.addEventListener('click', () => {
+        const isFullPage = containerEle.classList.contains('full-page');
+
+        if (isFullPage) {
+            viewFullPageButton.innerHTML = 'Full page';
+            const clonedEle = containerEle.nextElementSibling;
+            const rect = clonedEle.getBoundingClientRect();
+
+            containerEle.classList.remove('full-page');
+            containerEle.style.position = 'absolute';
+            const collapseAnimation = containerEle.animate([{
+                top: `${rect.top}px`,
+                left: `${rect.left}px`,
+            }], {
+                duration: 300,
+                easing: 'ease-in-out',
+            });
+            collapseAnimation.addEventListener('finish', () => {
+                clonedEle.remove();
+                containerEle.style.removeProperty('position');
+                containerEle.style.removeProperty('top');
+                containerEle.style.removeProperty('left');
+            });
+        } else {
+            viewFullPageButton.innerHTML = 'Close';
+            const rect = containerEle.getBoundingClientRect();
+
+            // Create the placeholder
+            const clonedEle = containerEle.cloneNode(true);
+            clonedEle.removeAttribute('id');
+            clonedEle.style.visibility = 'hidden';
+            containerEle.insertAdjacentElement('afterend', clonedEle);
+
+            containerEle.style.top = `${rect.top}px`;
+            containerEle.style.left = `${rect.left}px`;
+            containerEle.classList.add('full-page');
+            containerEle.animate([{
+                top: 0,
+                left: 0,
+            }], {
+                duration: 300,
+                easing: 'ease-in-out',
+                fill: 'forwards',
+            });
+        }
+    });
+});
+```
+</Playground>
+
+## See also
+
+-   [Enter full-screen mode](https://phuoc.ng/collection/html-dom/enter-full-screen-mode)
