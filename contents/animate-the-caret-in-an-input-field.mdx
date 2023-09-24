@@ -1,0 +1,390 @@
+---
+created: '2023-09-17'
+description: Animate the caret in an input field
+openGraphCover: /og/css-animation/animate-caret-input-field.png
+title: Animate the caret in an input field
+---
+
+When users interact with a text field, they expect to see a blinking caret indicating where they're typing. This tiny detail can make a big difference in the user experience. You've probably seen it before when entering digits in an OTP (One-Time Password) field.
+
+In this post, I'll show you how to add this feature to your website or application using CSS and JavaScript. It's a simple way to make your website or application more interactive and engaging.
+
+## Markup
+
+When you see an input field on a webpage, it usually comes with a default caret, which is that little blinking vertical line that shows you where you can type. But did you know that you can customize the color and shape of the caret using CSS styles?
+
+For example, if you want to change the caret color to a shade of gray and make its shape an underscore, you can use the following code:
+
+```css
+input[type="text"] {
+    caret-color: rgb(15 23 42);
+    caret-shape: underscore;
+}
+```
+
+While we have the ability to customize the caret, we are limited to certain possibilities and animations. Unfortunately, we cannot add any additional customization beyond that.
+
+To work around this limitation, we can use an extra element to represent the caret instead of relying on the default caret. We can achieve this by using a markup consisting of three elements: an outer element containing the input field and the caret element.
+
+```html
+<div class="container">
+    <input class="container__input" type="text" id="input" />
+    <div class="container__caret" id="caret"></div>
+</div>
+```
+
+## Basic styles
+
+First of all, we need to hide the default caret. To do this, we can set the `caret-color` (as mentioned earlier) to transparent.
+
+```css
+.container__input {
+    caret-color: transparent;
+}
+```
+
+To position the caret absolutely within its container, we need to set the `position` property of both the container and caret elements to `relative` and `absolute`, respectively. Then, we can use the CSS properties `left` and `top` to specify the caret's position relative to its container.
+
+For example, in the code snippet below, we set the container's position to relative and use absolute positioning for the caret. We then use the `left` property to align the caret with the left edge of its container. To center the caret vertically within its container, we use the `top` and `transform` properties together.
+
+```css
+.container {
+    position: relative;
+}
+
+.container__caret {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    transform: translateY(-50%);
+}
+```
+
+Initially, the custom caret is invisible. However, we need to make it visible when a user focuses on the input field. One way to achieve this is by using the `opacity` CSS property. In the code snippet below, we use the `:focus` pseudo-class and the `~` selector to change the opacity of the caret when the input field gets focus.
+
+```css
+.container__caret {
+    opacity: 0;
+}
+.container__input:focus ~ .container__caret {
+    opacity: 1;
+}
+```
+
+## Positioning the caret
+
+Let's talk about caret positioning in custom input fields. With absolute positioning, we can control exactly where the caret appears on the input field. When users enter text, we need to move the caret to the end of the input.
+
+To do this, we handle the `input` event, which triggers when the user changes the input's value. In this function, we measure the length of the current text and adjust the caret position accordingly.
+
+### Measuring text
+
+To measure text, we use the `measureWidth()` utility function, which measures the width of a given text string. It takes two arguments: `text`, which is the string to be measured, and `font`, which specifies the font used to render the text.
+
+```js
+const measureWidth = (text, font) => {
+    const canvasEle = document.createElement('canvas');
+    const context = canvasEle.getContext('2d');
+    context.font = font;
+    const metrics = context.measureText(text);
+    return metrics.width;
+};
+```
+
+Here's how it works: we create a `canvas` element using the `document.createElement()` method, and then get the 2D rendering context for the canvas using its `getContext()` method. We set the font of this context to match that passed in as an argument, and then use its `measureText()` method to get metrics for our text string. The resulting object contains various properties related to the dimensions of our rendered text. Finally, we return just one of those properties - specifically, `metrics.width` - which gives us the width of our rendered text in pixels.
+
+Now that we can measure text, we need to determine the font used by the input element. We can use the `window.getComputedStyle()` method to get all the CSS properties applied to this element, and then extract the font size and font family using the `getPropertyValue()` method. Finally, we concatenate these two values to get the complete font style of the input element.
+
+```js
+const inputStyles = window.getComputedStyle(inputEle);
+const font = `${inputStyles.getPropertyValue('font-size')} ${inputStyles.getPropertyValue('font-family')}`;
+```
+
+### Moving the cursor to a new position
+
+To adjust the caret position based on the input value, we need to calculate its distance from the left side of the container. We do this by adding the width of our text (which we measured earlier) to the input's `padding-left` value. If this sum plus the width of our caret is less than the total width of our input field (as determined by `getBoundingClientRect().width`), we can translate the caret horizontally by that sum.
+
+For example, let's say our text is 50 pixels wide and our input's padding-left value is 10 pixels. In this case, we'll position our caret 62 pixels from the left edge of its container (i.e., 50 + 10 + 2).
+
+We can use the `translate()` function to achieve this. It's important to keep in mind that we need to translate the caret 50% to the top vertically to ensure that it remains centered.
+
+Here's an example of what the input event handler could look like:
+
+```js
+const inputEle = document.getElementById('input');
+const caretEle = document.getElementById('caret');
+
+const updateCaretPosition = () => {
+    const text = inputEle.value;
+    const inputStyles = window.getComputedStyle(inputEle);
+    const font = `${inputStyles.getPropertyValue('font-size')} ${inputStyles.getPropertyValue('font-family')}`;
+    const paddingLeft = parseInt(inputStyles.getPropertyValue('padding-left'), 10) + 2;
+    const caretWidth = caretEle.getBoundingClientRect().width;
+
+    const textWidth = measureWidth(text, font) + paddingLeft;
+    const inputWidth = inputEle.getBoundingClientRect().width;
+
+    if (textWidth + caretWidth < inputWidth) {
+        caretEle.style.transform = `translate(${textWidth}px, -50%)`;
+    }
+};
+
+inputEle.addEventListener('input', updateCaretPosition);
+```
+
+## Animating the transition
+
+Adding an animation when updating the caret position is now a breeze. We can simply use the `transition` property.
+
+For example, when the caret updates its position, we can smoothly transition it to its new spot over 200 milliseconds. Here are the styles you'll need for the caret element:
+
+```css
+.container__caret {
+    transition: transform 0.2s;
+}
+```
+
+Take a look at the results of the steps we've been following.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.container {
+    position: relative;
+}
+.container__input {
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.25rem;
+    padding: 0 0.5rem;
+    height: 2rem;
+    outline: none;
+    width: 12rem;
+
+    caret-color: transparent;
+}
+.container__caret {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 1.5rem;
+    width: 2px;
+
+    background: rgb(15 23 42);
+    opacity: 0;
+    transition: transform 0.2s;
+}
+.container__input:focus ~ .container__caret {
+    opacity: 1;
+}
+```
+
+```html index.html
+<div class="container">
+    <input class="container__input" type="text" id="input" placeholder="Enter your name ..." />
+    <div class="container__caret" id="caret"></div>
+</div>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const inputEle = document.getElementById('input');
+    const caretEle = document.getElementById('caret');
+
+    const canvasEle = document.createElement('canvas');
+    const context = canvasEle.getContext('2d');
+
+    const inputStyles = window.getComputedStyle(inputEle);
+    const font = `${inputStyles.getPropertyValue('font-size')} ${inputStyles.getPropertyValue('font-family')}`;
+    const paddingLeft = parseInt(inputStyles.getPropertyValue('padding-left'), 10) + 2;
+    const caretWidth = caretEle.getBoundingClientRect().width;
+
+    const measureWidth = (text, font) => {
+        context.font = font;
+        const metrics = context.measureText(text);
+        return metrics.width;
+    };
+
+    const updateCaretPosition = () => {
+        const text = inputEle.value;
+        const textWidth = measureWidth(text, font) + paddingLeft;
+        const inputWidth = inputEle.getBoundingClientRect().width;
+        if (textWidth + caretWidth < inputWidth) {
+            caretEle.style.transform = `translate(${textWidth}px, -50%)`;
+        }
+    };
+
+    inputEle.addEventListener('input', updateCaretPosition);
+
+    updateCaretPosition();
+});
+```
+</Playground>
+
+> **Note**
+>
+> It's important to note that we don't want to create a new canvas element and compute the styles of the input element for every keystroke. Doing so can slow down the app.
+>
+> To avoid this, we can create and reuse the canvas element. Similarly, we can determine the input styles such as font size, font family, and padding left only once.
+
+You may notice that when entering or removing characters using the Backspace key, the caret follows the corresponding position. However, if you try to move the cursor inside the input using the arrow keys, you'll see that the caret doesn't move to the desired position.
+
+Don't worry, we'll address this issue in the next section.
+
+## Moving the cursor
+
+In order to update the cursor position when users move it within the input field, we need to handle the `selectionchange` event. This event is triggered whenever there is any selection change within the document, such as when a user selects text on a webpage or moves the cursor within an input field.
+
+Inside the event handler, we first check if the user is currently focused on the input by comparing the current active element (`document.activeElement`) against the input element. If the user is focused on the input, we update the caret position based on the cursor position, which can be retrieved from the `selectionStart` property.
+
+```js
+const handleSelectionChange = () => {
+    if (document.activeElement === inputEle) {
+        updateCaretPosition(inputEle.selectionStart);
+    }
+};
+
+document.addEventListener('selectionchange', handleSelectionChange);
+```
+
+We have a function called `updateCaretPosition`, which takes the desired target position as its only parameter and updates the caret position. This function is similar to the input event handler that we implemented in the previous section.
+
+```js
+const updateCaretPosition = (position) => {
+    const text = inputEle.value.substr(0, position);
+    const textWidth = measureWidth(text, font) + paddingLeft;
+    const inputWidth = inputEle.getBoundingClientRect().width;
+    if (textWidth + caretWidth < inputWidth) {
+        caretEle.style.transform = `translate(${textWidth}px, -50%)`;
+    }
+};
+```
+
+Note that the `selectionchange` event is also triggered when users change the input value, so we no longer need to handle the `input` event. However, we still need to allow users to remove characters from the input using the Backspace key. We can achieve this using the `keydown` event:
+
+```js
+ const handleKeyDown = (e) => {
+    if (e.key === 'Backspace') {
+        updateCaretPosition(inputEle.value.length - 1);
+    }
+};
+
+inputEle.addEventListener('keydown', handleKeyDown);
+```
+
+In this example, we check if the user presses the Backspace key by checking the `key` property. If this happens, we move the caret position to the end of the input.
+
+Now, it's time to check out the final demo. Try moving the cursor around using the left or right arrow keys, and you'll see that the caret moves to the desired position correctly.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.container {
+    position: relative;
+}
+.container__input {
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.25rem;
+    padding: 0 0.5rem;
+    height: 2rem;
+    outline: none;
+    width: 12rem;
+
+    caret-color: transparent;
+}
+.container__caret {
+    position: absolute;
+    left: 0;
+    top: 50%;
+    height: 1.5rem;
+    width: 2px;
+
+    background: rgb(15 23 42);
+    opacity: 0;
+    transition: transform 0.2s;
+}
+.container__input:focus ~ .container__caret {
+    opacity: 1;
+}
+```
+
+```html index.html
+<div class="container">
+    <input class="container__input" type="text" id="input" placeholder="Enter your name ..." />
+    <div class="container__caret" id="caret"></div>
+</div>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const inputEle = document.getElementById('input');
+    const caretEle = document.getElementById('caret');
+
+    const canvasEle = document.createElement('canvas');
+    // Get the context
+    const context = canvasEle.getContext('2d');
+
+    const inputStyles = window.getComputedStyle(inputEle);
+    const font = `${inputStyles.getPropertyValue('font-size')} ${inputStyles.getPropertyValue('font-family')}`;
+    const paddingLeft = parseInt(inputStyles.getPropertyValue('padding-left'), 10) + 2;
+    const caretWidth = caretEle.getBoundingClientRect().width;
+
+    const measureWidth = (text, font) => {
+        context.font = font;
+        // Measure the text
+        const metrics = context.measureText(text);
+        // Return the width in pixels
+        return metrics.width;
+    };
+
+    const updateCaretPosition = (position) => {
+        const text = inputEle.value.substr(0, position);
+        const textWidth = measureWidth(text, font) + paddingLeft;
+        const inputWidth = inputEle.getBoundingClientRect().width;
+        if (textWidth + caretWidth < inputWidth) {
+            caretEle.style.transform = `translate(${textWidth}px, -50%)`;
+        }
+    };
+
+    const handleSelectionChange = () => {
+        if (document.activeElement === inputEle) {
+            updateCaretPosition(inputEle.selectionStart);
+        }
+    };
+
+    const handleKeyDown = (e) => {
+        if (e.key === 'Backspace') {
+            updateCaretPosition(inputEle.value.length - 1);
+        }
+    };
+
+    inputEle.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('selectionchange', handleSelectionChange);
+
+    updateCaretPosition();
+});
+```
+</Playground>
+
+## Conclusion
+
+By following these steps, you can create a simple and effective animation for the caret in a text field. This can significantly improve the user experience and give your website a professional and polished feel.
+
+## See also
+
+-   [Blinking cursor](https://phuoc.ng/collection/css-animation/blinking-cursor)
+-   [Build an OTP input field](https://phuoc.ng/collection/html-dom/build-an-otp-input-field)
+-   [Measure the width of given text of given font](https://phuoc.ng/collection/html-dom/measure-the-width-of-given-text-of-given-font)
