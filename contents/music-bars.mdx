@@ -1,0 +1,180 @@
+---
+created: '2023-09-19'
+description: Create music bars animation in CSS
+openGraphCover: /og/css-animation/music-bars.png
+title: Music bars
+---
+
+If you want to let your website or app users know that a song is currently playing, music bars can be an excellent option. These are animated visualizations that move along with the rhythm of the song, providing a clear and engaging way for users to see that music is playing.
+
+In this post, we'll show you how to create fake music bars using CSS. So, let's dive in and get started!
+
+## Markup
+
+To create a convincing music bar effect, we'll use four different bars that move at different intervals. Each bar represents a different frequency in the song. By moving them independently of each other, we can create an animated visualization.
+
+The first bar represents the bass frequencies, which typically have the slowest rhythm in a song. The second bar represents mid-range frequencies, while the third and fourth bars represent higher frequencies such as vocals or cymbals.
+
+To begin, we'll create a container element that holds all of our bars. In the next section, we'll dive into how to create these bars using CSS. Stay tuned!
+
+```html
+<div class="bars">
+    <div class="bars__item"></div>
+    <div class="bars__item"></div>
+    <div class="bars__item"></div>
+    <div class="bars__item"></div>
+</div>
+```
+
+## Basic styles
+
+To make the bars in `.bars` and `.bars__item` look great, we'll add some basic styles. First, we turned the container element into a flexbox with `align-items: flex-end` and `justify-content: center` declarations. This makes the bars align at the bottom and center them horizontally.
+
+We also gave each bar a gradient background that starts from the bottom and fades towards the top, giving the visualization some depth. Finally, each bar is 0.5rem wide and stretches 100% vertically within its container.
+
+Here's a sneak peek of what these CSS classes look like:
+
+```css
+.bars {
+    align-items: flex-end;
+    justify-content: center;
+    display: flex;
+    gap: 0.25rem;
+
+    height: 4rem;
+}
+.bars__item {
+    background-image: linear-gradient(to top, rgb(14 165 233), rgb(99 102 241));
+    height: 100%;
+    width: 0.5rem;
+}
+```
+
+## Animation
+
+We're using CSS animations to create a cool effect for our music bars. By adjusting the timing and speed of each animation, we can make the bars move independently and sync up perfectly with any song playing on our platform.
+
+To make the animation, we're using a CSS `@keyframes` rule, which lets us define a set of styles that should be applied at different points during the animation timeline.
+
+Our `play` animation has five keyframes, each representing a different point in time during the animation. We adjust the height of each bar at each keyframe to create the illusion of movement. We start with a height of 10%, then gradually increase it to 75%, then back down to 50%, up to 100%, and finally back down to 10%. This gives us a smooth and dynamic animation that moves with the rhythm of the song.
+
+```css
+@keyframes play {
+    0% {
+        height: 10%;
+    }
+
+    25% {
+        height: 75%;
+    }
+
+    50% {
+        height: 50%;
+    }
+
+    75% {
+        height: 100%;
+    }
+
+    100% {
+        height: 10%;
+    }
+}
+```
+
+By adding different delays to each bar, we can create even more complexity and make the visualization feel like a natural representation of the music. With some experimentation, you can fine-tune your music bars to match perfectly with what you need.
+
+```css
+.bars__item:nth-child(1) {
+    animation-delay: 0s;
+}
+.bars__item:nth-child(2) {
+    animation-delay: 0.5s;
+}
+.bars__item:nth-child(3) {
+    animation-delay: 0.2s;
+}
+.bars__item:nth-child(4) {
+    animation-delay: 0.75s;
+}
+```
+
+Lastly, we'll run an animation on all of our bars for a duration of 1 second. We've chosen the `ease-out` timing function, which means that the animation will start quickly and then gradually slow down towards the end. We've set the animation to repeat infinitely, so it will continue running until we manually stop it.
+
+```css
+.bars__item {
+    animation: play 1s ease-out infinite;
+}
+```
+
+By implementing these declarations, we can make the music bars on our platform move up and down as a song plays, adding a fun and engaging element for users. Let's take a look at the results of the steps we've been following.
+
+<Playground>
+```css demo.css hidden
+body {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+```
+
+```css styles.css
+.bars {
+    align-items: flex-end;
+    justify-content: center;
+    display: flex;
+    gap: 0.25rem;
+
+    height: 4rem;
+}
+.bars__item {
+    animation: play 1s ease-out infinite;
+    background-image: linear-gradient(to top, rgb(14 165 233), rgb(99 102 241));
+    height: 100%;
+    width: 0.5rem;
+}
+.bars__item:nth-child(1) {
+    animation-delay: 0s;
+}
+.bars__item:nth-child(2) {
+    animation-delay: 0.5s;
+}
+.bars__item:nth-child(3) {
+    animation-delay: 0.2s;
+}
+.bars__item:nth-child(4) {
+    animation-delay: 0.75s;
+}
+
+@keyframes play {
+    0% {
+        height: 10%;
+    }
+
+    25% {
+        height: 75%;
+    }
+
+    50% {
+        height: 50%;
+    }
+
+    75% {
+        height: 100%;
+    }
+
+    100% {
+        height: 10%;
+    }
+}
+```
+
+```html index.html
+<div class="bars">
+    <div class="bars__item"></div>
+    <div class="bars__item"></div>
+    <div class="bars__item"></div>
+    <div class="bars__item"></div>
+</div>
+```
+</Playground>
