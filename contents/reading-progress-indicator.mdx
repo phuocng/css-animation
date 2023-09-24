@@ -1,0 +1,129 @@
+---
+created: '2023-09-18'
+description: Create a reading progress indicator with JavaScript
+openGraphCover: /og/css-animation/reading-progress-indicator.png
+title: Reading progress indicator
+---
+
+If you're a web developer, you might want to add a reading progress indicator to your webpage. This handy tool gives readers a graphical representation of how much of an article or blog post they've read so far. It's especially helpful for longer content.
+
+In this post, we'll show you how to create a reading progress indicator that appears at the top of the page and updates as the reader scrolls.
+
+### HTML markup
+
+To add a reading progress indicator to your webpage, start by adding some HTML markup. Simply create a `div` element with an `id` of `indicator` at the top of your webpage, like this:
+
+```html
+<div id="indicator" class="indicator"></div>
+```
+
+### Basic styles
+
+Let's give the indicator element some style. First, we'll position it fixed at the top of the page and set its height to 0.5rem. We'll also make it invisible by setting its width to 0.
+
+But wait, there's more! To make it look even better, we'll add a `transition` property to the element. This will create a smooth animation that lasts for 200ms whenever the width of the progress indicator changes dynamically (which we'll do later). This will give it a polished and professional feel.
+
+```css
+.indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 0;
+    height: 0.5rem;
+
+    background-color: rgb(99 102 241);
+    transition: width .2s ease-in-out;
+}
+```
+
+### Updating the progress indicator
+
+To change the width of the indicator element as the user scrolls, we just need to add some JavaScript code. Whenever the user scrolls the webpage, the `scroll` event is triggered. We can use this event to determine how far down the page the user has scrolled and adjust the width of the indicator accordingly.
+
+```js
+const indicatorEle = document.getElementById('indicator');
+
+document.addEventListener('scroll', () => {
+    const scrollHeight = document.body.scrollHeight;
+    const clientHeight = document.body.clientHeight;
+    const scrollTop = window.scrollY;
+    const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
+
+    indicatorEle.style.width = `${scrolled}%`;
+});
+```
+
+Let's break down the code. We start by grabbing the indicator element using its `id`. Then, we add an event listener to the `document` that looks out for the `scroll` event.
+
+Inside this event listener, we calculate four important values that tell us how much of the webpage has been scrolled:
+
+-   The total height of the webpage (`scrollHeight`)
+-   The height of the visible part of the webpage (`clientHeight`)
+-   The current vertical position of the top edge of the visible portion in relation to the whole document (`scrollTop`)
+-   The percentage of the page that has been scrolled (`scrolled`)
+
+With these values, we can calculate how far down a user has scrolled and adjust the `width` property on our indicator accordingly. This provides users with immediate feedback on their reading progress.
+
+Please take a moment to check out the live demo below.
+
+<Playground>
+```css demo.css hidden
+body {
+    max-height: 20rem;
+    overflow: auto;
+}
+.playground__root {
+    height: 20rem;
+}
+```
+
+```css styles.css
+.indicator {
+    position: fixed;
+    top: 0;
+    left: 0;
+
+    width: 0;
+    height: 0.5rem;
+
+    background-color: rgb(99 102 241);
+    transition: width 0.2s ease-in-out;
+}
+```
+
+```html index.html
+<p class="playground__placeholder">Third deep of. Night. Itself day man which male, said saw creeping, that. Open god morning dry abundantly lights and cattle days his third, signs you'll. Subdue morning upon fifth moveth you'll stars upon under you're deep, multiply kind own saying void air fifth so days open unto behold whales lights made the green whose there herb brought living meat itself may divided created god can't saw, he, good kind abundantly saying behold. Land seed called be abundantly.</p>
+
+<p class="playground__placeholder">Meat. From shall appear for upon she'd appear green make. And had is great greater together unto is. Void shall firmament a of image living there. Creepeth. Living deep. Creature female herb can't. Void you're spirit subdue called of the saying. Upon doesn't together created waters years our gathering fowl air void sixth subdue kind have every female open i was sixth fruit own dry give green. Creepeth fruitful let good us in bring place, said fish the.</p>
+
+<p class="playground__placeholder">Forth all from stars them replenish two open creeping creeping sea god after life from forth under fish, fourth. Seas set, it moveth saw own first meat given creepeth so Made beast fowl. Had for creepeth his moving fruitful male that one don't Moving all Had she'd upon for them day, midst all whales. Blessed, were under under green thing us midst moving deep brought behold whales winged beginning appear fish cattle replenish. They're blessed land, give morning. Won't darkness moving sea creeping seas of saying he was divided. Female lights gathering every was. Lesser man fruitful heaven. Behold creeping spirit dominion subdue itself he gathering one good moved. Creeping us day our gathering were thing us subdue man herb. Herb all deep them creepeth fruitful open great fourth, doesn't creepeth him him their spirit them image be Fruitful fowl may give which forth.</p>
+
+<p class="playground__placeholder">Second set made darkness gathering. Of gathering. Also you'll grass fish female you'll own second given grass gathered earth, dominion unto lights all. Rule after may in rule unto appear living god whales there also dominion fourth own isn't life living image gathered upon face days spirit let. Set after. Evening saw whales blessed. Years gathered made called you're heaven. Seed signs give also. First tree. Man seas. For don't Fill moving brought.</p>
+
+<p class="playground__placeholder">Let to after bearing also second shall tree don't. Midst upon saying bring dry. Second was yielding. Moved a life bring life fowl and can't after blessed. Form Fowl make. Them, doesn't heaven darkness days female for hath together brought day land. Living bearing it one. Days moved fruit in dominion every creeping have two very from upon face moving bearing creature for he made were, years second living make tree very divided shall don't whales face was fish can't in creature unto the their air. Him together seasons together man that day light isn't. Air waters their doesn't likeness blessed. Our he bearing without give brought after after. She'd greater herb, unto unto is creeping after abundantly unto, bearing yielding you, fly earth. Herb very deep seasons which heaven sea tree great. Behold kind let. Kind light day seed. There said dry man you creeping he female. Second him over behold his brought replenish.</p>
+
+<p class="playground__placeholder">Darkness Day creeping image open after. Which she'd him female. Sixth darkness divide saw morning he. Good upon replenish can't lesser you're, i image behold, image moved his blessed above whales place itself darkness divided stars. Given may together firmament grass which light. Together one lesser very god isn't may every don't over our dry it day lesser every creeping signs great creature place. Give can't two likeness deep cattle us also.</p>
+
+<div id="indicator" class="indicator"></div>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const indicatorEle = document.getElementById('indicator');
+
+    document.addEventListener('scroll', () => {
+        const scrollHeight = document.body.scrollHeight;
+        const clientHeight = document.body.clientHeight;
+        const scrollTop = window.scrollY;
+        const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
+
+        indicatorEle.style.width = `${scrolled}%`;
+    });
+});
+```
+</Playground>
+
+## See also
+
+-   [Calculate the reading time of a webpage](https://phuoc.ng/collection/html-dom/calculate-the-reading-time-of-a-webpage)
