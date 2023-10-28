@@ -1,0 +1,434 @@
+---
+created: '2023-10-14'
+description: Navigate to a specific item in a carousel slider
+openGraphCover: /og/css-animation/navigate-specific-item-carousel-slider.png
+title: Navigate to a specific item in a carousel slider
+---
+
+A carousel slider is a component that lets users easily browse through a collection of items, such as images or cards, by sliding them horizontally or vertically. It's a popular feature on websites and mobile apps that showcase products, features, or news articles.
+
+Carousel sliders can be found on a wide range of websites and apps, including e-commerce platforms, news portals, and social media sites. They offer an interactive and engaging way for users to navigate content without taking up too much screen space.
+
+In this post, we'll learn how to add smooth animation to the carousel slider, making it even more enjoyable for users to navigate.
+
+## Understanding HTML markup
+
+Before we dive into the next section, it's recommended that you take a look at this [post](https://phuoc.ng/collection/css-layout/carousel-slider/). It outlines how we use CSS to create a carousel slider.
+
+Here's a look at what the slider looks like without any interaction:
+
+<Playground>
+```css styles.css
+.slider {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 20rem;
+}
+.slider__inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+}
+.slider__item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* Demo purpose */
+    background: rgb(241 245 249);
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 500;
+}
+.slider__navigation {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.slider__dot {
+    background: rgb(203 213 225);
+    border-radius: 50%;
+    cursor: pointer;
+
+    height: 0.5rem;
+    width: 0.5rem;
+}
+
+.slider__prev,
+.slider__next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 1rem;
+    width: 0.5rem;
+}
+.slider__prev::before,
+.slider__next::before {
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    border-style: solid;
+    height: 0;
+    width: 0;
+}
+.slider__prev::before {
+    border-color: transparent rgb(148 163 184) transparent transparent;
+    border-width: 0.5rem 0.5rem 0.5rem 0;
+}
+.slider__next::before {
+    border-color: transparent transparent transparent rgb(148 163 184);
+    border-width: 0.5rem 0 0.5rem 0.5rem;
+}
+.slider__prev {
+    left: 0.5rem;
+}
+.slider__next {
+    right: 0.5rem;
+}
+```
+
+```html index.html
+<div class="slider" id="slider">
+    <div class="slider__inner">
+        <div class="slider__item" style="transform: translateX(0%)">1</div>
+        <div class="slider__item" style="transform: translateX(100%)">2</div>
+        <div class="slider__item" style="transform: translateX(200%)">3</div>
+        <div class="slider__item" style="transform: translateX(300%)">4</div>
+        <div class="slider__item" style="transform: translateX(400%)">5</div>
+    </div>
+
+    <div class="slider__navigation">
+        <div class="slider__dot"></div>
+        <div class="slider__dot"></div>
+        <div class="slider__dot"></div>
+        <div class="slider__dot"></div>
+        <div class="slider__dot"></div>
+    </div>
+
+    <div class="slider__prev"></div>
+    <div class="slider__next"></div>
+</div>
+```
+</Playground>
+
+## Adding animation to navigation
+
+There are several ways to navigate between items: by clicking the corresponding dot or the previous or next arrow. To enable this functionality, you'll need to create a function that jumps to the selected item.
+
+```js
+const sliderEle = document.getElementById('slider');
+const innerEle = sliderEle.querySelector('.slider__inner');
+
+const jump = (index) => {
+    innerEle.style.transform = `translateX(${-100 * index}%)`;
+};
+```
+
+The `jump()` function lets us navigate to a specific item in the carousel slider. When we call this function, it shifts the inner container to the left by a value that moves the target item into view.
+
+To make this transition smooth and visually appealing, we can add an animation effect using CSS transitions. We apply a `transition` property to the `.slider__inner` element with a value of `0.4s transform`. This tells the browser to animate any changes made to the `transform` property of this element over a duration of 0.4 seconds. This way, you get a nice, polished look and feel for your carousel slider.
+
+```css
+.slider__inner {
+    transition: 0.4s transform;
+}
+```
+
+Now, when we call the `jump()` function and change the `transform` property of `.slider__inner`, the animation will run smoothly over 0.4 seconds.
+
+To navigate to the corresponding item when a dot is clicked, we can add an event listener to each dot element. When a dot is clicked, we can determine its index in the array of dots and use that index to call the `jump()` function with the correct argument.
+
+Here's how we can do it:
+
+```js
+const dots = [...sliderEle.querySelectorAll('.slider__dot')];
+
+dots.forEach((dot) => {
+    dot.addEventListener('click', () => {
+        const index = dots.indexOf(dot);
+        jump(index);
+    });
+});
+```
+
+To start, we select all elements with the `.slider__dot` class using `querySelectorAll()`. This gives us a NodeList, which we convert into an array using the spread operator (`...`). This lets us use array methods like `forEach()`.
+
+For each dot element, we add a `click` event listener that calls a callback function when the element is clicked. Inside this function, we use `indexOf()` to determine the index of the current dot element. This returns the first index at which a given element can be found in the array of dots.
+
+We then pass this index as an argument to our `jump()` function, which activates the corresponding item in our carousel slider.
+
+## Navigating to the previous and next items
+
+To navigate to the previous and next items in our carousel slider, we can add click event listeners to the previous and next arrow elements. We'll use the `jump()` function we created earlier to handle the navigation.
+
+First, we define two variables: `numItems`, which represents the total number of elements in our carousel slider, and `currentIndex`, which represents the index of the currently active item (initially set to zero).
+
+```js
+const numItems = dots.length;
+let currentIndex = 0;
+```
+
+Next, we select both the previous and next arrow elements using `querySelector()`.
+
+```js
+const prevEle = sliderEle.querySelector('.slider__prev');
+const nextEle = sliderEle.querySelector('.slider__next');
+```
+
+We add a `click` event listener to each element that calls a callback function when clicked.
+
+Inside each callback function, we check whether it's possible to move in either direction. If moving backward (`prev`), we make sure that there isn't any "underflow" by checking whether the current index is greater than zero. If moving forward (`next`), we make sure that there isn't any "overflow" by checking whether the current index is less than `numItems - 1`.
+
+If it's possible to move in either direction, we call `jump()` with an argument of `currentIndex + 1` or `currentIndex - 1`, depending on the direction.
+
+```js
+prevEle.addEventListener("click", () => {
+    if (currentIndex > 0) {
+        jump(currentIndex - 1);
+    }
+});
+
+nextEle.addEventListener("click", () => {
+    if (currentIndex < numItems - 1) {
+        jump(currentIndex + 1);
+    }
+});
+```
+
+## Adding animation to the active dot
+
+To take the user experience to the next level, we can animate the active dot. To position the active dot inside the navigation, we first need to add a new element with the class `slider__dot--active` as follow:
+
+```html
+<div class="slider__navigation">
+    <div class="slider__dot"></div>
+    <div class="slider__dot"></div>
+    <div class="slider__dot"></div>
+    <div class="slider__dot"></div>
+    <div class="slider__dot"></div>
+
+    <div class="slider__dot--active"></div>
+</div>
+```
+
+The element indicates which dot is currently active and is positioned absolutely within the navigation container. We then set its `top` and `left` properties to `0`, which positions it at the top left corner of the container. Since it's positioned absolutely, it will be positioned relative to the navigation container.
+
+Finally, we can add some additional styles to give the active dot a distinct appearance from the inactive dots. In our example, we've set its background color to a darker shade of blue than the inactive dots, but this can be customized based on your design preferences.
+
+Here's an example of the active dot element styles:
+
+```css
+.slider__dot--active {
+    background: rgb(100 116 139);
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+```
+
+We can make the active dot element's animation smoother by adding a `transition` property to its CSS ruleset. This property tells the browser to animate any changes made to the `transform` property of the element over a period of 0.4 seconds.
+
+```css
+.slider__dot--active {
+    transition: 0.4s transform;
+}
+```
+
+With this property in place, any change we make to the `transform` property of our active dot element will be animated smoothly over a period of 0.4 seconds.
+
+To update the position and animate the active dot when we navigate between items in our carousel slider, we'll need to modify our `jump()` function slightly.
+
+We can start by selecting our active dot element using `querySelector()`. We then set its `transform` property to translate it horizontally by a value equal to the offset of the currently active dot.
+
+```js
+const activeDot = sliderEle.querySelector('.slider__dot--active');
+
+const jump = (index) => {
+    currentIndex = index;
+    const dot = dots[currentIndex];
+    activeDot.style.transform = `translateX(${dot.offsetLeft}px)`;
+};
+```
+
+With these changes in place, our active dot will now smoothly transition from one position to another as we navigate between items in our carousel slider.
+
+## Demo
+
+Let's check out the final result. Click on the dots or arrows to see how both the target item and corresponding slot are animated simultaneously.
+
+<Playground>
+```css styles.css
+.slider {
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+    height: 20rem;
+}
+.slider__inner {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    transition: 0.4s transform;
+}
+.slider__item {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+
+    /* Demo purpose */
+    background: rgb(241 245 249);
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    font-size: 2.5rem;
+    font-weight: 500;
+}
+.slider__navigation {
+    position: absolute;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+
+    align-items: center;
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.slider__dot,
+.slider__dot--active {
+    background: rgb(203 213 225);
+    border-radius: 50%;
+    cursor: pointer;
+
+    height: 0.5rem;
+    width: 0.5rem;
+}
+.slider__dot--active {
+    background: rgb(100 116 139);
+    position: absolute;
+    top: 0;
+    left: 0;
+
+    transition: 0.4s transform;
+}
+
+.slider__prev,
+.slider__next {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 1rem;
+    width: 0.5rem;
+}
+.slider__prev::before,
+.slider__next::before {
+    cursor: pointer;
+    content: '';
+    position: absolute;
+    border-style: solid;
+    height: 0;
+    width: 0;
+}
+.slider__prev::before {
+    border-color: transparent rgb(148 163 184) transparent transparent;
+    border-width: 0.5rem 0.5rem 0.5rem 0;
+}
+.slider__next::before {
+    border-color: transparent transparent transparent rgb(148 163 184);
+    border-width: 0.5rem 0 0.5rem 0.5rem;
+}
+.slider__prev {
+    left: 0.5rem;
+}
+.slider__next {
+    right: 0.5rem;
+}
+```
+
+```html index.html
+<div class="slider" id="slider">
+    <div class="slider__inner">
+        <div class="slider__item" style="transform: translateX(0%)">1</div>
+        <div class="slider__item" style="transform: translateX(100%)">2</div>
+        <div class="slider__item" style="transform: translateX(200%)">3</div>
+        <div class="slider__item" style="transform: translateX(300%)">4</div>
+        <div class="slider__item" style="transform: translateX(400%)">5</div>
+    </div>
+
+    <div class="slider__navigation">
+        <div class="slider__dot"></div>
+        <div class="slider__dot"></div>
+        <div class="slider__dot"></div>
+        <div class="slider__dot"></div>
+        <div class="slider__dot"></div>
+
+        <div class="slider__dot--active"></div>
+    </div>
+
+    <div class="slider__prev"></div>
+    <div class="slider__next"></div>
+</div>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const sliderEle = document.getElementById('slider');
+    const innerEle = sliderEle.querySelector('.slider__inner');
+    const dots = [...sliderEle.querySelectorAll('.slider__dot')];
+    const activeDot = sliderEle.querySelector('.slider__dot--active');
+
+    const prevEle = sliderEle.querySelector('.slider__prev');
+    const nextEle = sliderEle.querySelector('.slider__next');
+
+    const numItems = dots.length;
+    let currentIndex = 0;
+
+    const jump = (index) => {
+        currentIndex = index;
+        const dot = dots[currentIndex];
+        innerEle.style.transform = `translateX(${-100 * currentIndex}%)`;
+        activeDot.style.transform = `translateX(${dot.offsetLeft}px)`;
+    };
+
+    dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+            const index = dots.indexOf(dot);
+            jump(index);
+        });
+    });
+
+    prevEle.addEventListener('click', () => {
+        if (currentIndex > 0) {
+            jump(currentIndex - 1);
+        }
+    });
+    nextEle.addEventListener('click', () => {
+        if (currentIndex < numItems - 1) {
+            jump(currentIndex + 1);
+        }
+    });
+});
+```
+</Playground>
+
+## See also
+
+-   [Carousel slider](https://phuoc.ng/collection/css-layout/carousel-slider/)
