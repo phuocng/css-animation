@@ -1,0 +1,635 @@
+---
+created: '2023-10-17'
+description: Animate the removal or addition of an item in a list
+openGraphCover: /og/css-animation/animate-removal-addition-item-list.png
+tags: animate list, MutationObserver, web animation API
+title: Animate the removal or addition of an item in a list
+---
+
+Working with dynamic items in a list is a common task in web development, especially when dealing with user-generated content. For example, think about a social media platform where users can post comments on a particular post. The comments section is constantly changing as users add or delete their comments. Another example is an e-commerce website that displays a list of products on the page. When a user adds or removes items from their cart, the list of products displayed changes dynamically.
+
+To enhance the user experience, we can automatically animate the addition or removal of an item in the list. This provides visual feedback and gives our web applications a more polished and professional look.
+
+In this post, we'll show you how to achieve this effect using a `MutationObserver`. By watching for changes to the list, we can trigger an animation whenever an item is added or removed.
+
+To make things easier, we'll use a simple todo list application as an example. Users can add new tasks or remove existing ones, and we'll demonstrate how the animation works in this context.
+
+## Building a simple task management app
+
+Let's dive into building a basic todo app! First, we need to organize the markup, which consists of two elements: an input field for adding new tasks and a display area for the list of tasks.
+
+Here's how it's organized:
+
+```html
+<div class="todo">
+    <input class="todo__input" placeholder="Enter new task ..." type="text" id="newTask" />
+    <div id="tasks"></div>
+</div>
+```
+
+To add a new task, users can simply type it into the main input and hit Enter. To make this happen, we handle the `input` event which is triggered whenever the user modifies the input's value.
+
+In the handler, we check if the input is not empty. We also determine if the user has pressed the Enter key by checking the `key` property.
+
+```js
+const newTaskInput = document.getElementById('newTask');
+
+newTaskInput.addEventListener('keydown', (e) => {
+    const newTask = e.target.value;
+    if (newTask && e.key === 'Enter') {
+        // Add new task ...
+    }
+});
+```
+
+Let's keep things simple and skip the unnecessary details for this post. We won't bother with using variables to store the task model. Instead, we'll create a new element to display the newly created task. This element will have two components: one for displaying the task and one for removing it from the list. Here's an example:
+
+```js
+// Add new task
+const div = document.createElement("div");
+div.classList.add("todo__task");
+
+const taskEle = document.createElement("div");
+taskEle.classList.add("todo__label");
+taskEle.innerHTML = newTask;
+
+const removeBtn = document.createElement("button");
+removeBtn.innerHTML = "Remove";
+removeBtn.classList.add("todo__button");
+```
+
+In this example, we create a new `div` element to represent a task. Within that `div`, we create two elements: `taskEle` for displaying the task and `removeBtn` for removing the task. When a user clicks the remove button, we remove the entire task element.
+
+```js
+removeBtn.addEventListener("click", () => {
+    div.remove();
+});
+```
+
+Next, we simply use the `append` function to add these two elements to the task element. Then, we append the task element to the list of tasks element.
+
+```js
+div.append(taskEle, removeBtn);
+tasksEle.appendChild(div);
+```
+
+Up to this point, we've used straightforward DOM manipulation functions to create new task elements or remove them from the list as users add or remove tasks.
+
+This is all pretty basic stuff, with no fancy animations involved.
+
+<Playground>
+```css styles.css
+.todo {
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+.todo__input {
+    align-items: center;
+    display: flex;
+
+    border: transparent;
+    height: 2rem;
+    outline: none;
+    padding: 0 1rem;
+    width: 100%;
+}
+.todo__task {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+
+    border-top: 1px solid rgb(203 213 225);
+    padding: 0 1rem;
+}
+.todo__label {
+    flex: 1;
+}
+.todo__button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    height: 2rem;
+    padding: 0 1rem;
+    text-decoration: underline;
+}
+```
+
+```html index.html
+<div class="todo">
+    <input class="todo__input" placeholder="Enter new task ..." type="text" id="newTask" />
+    <div id="tasks"></div>
+</div>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const newTaskInput = document.getElementById('newTask');
+    const tasksEle = document.getElementById('tasks');
+
+    newTaskInput.addEventListener('keydown', (e) => {
+        const newTask = e.target.value;
+        if (!newTask || e.key !== 'Enter') {
+            return;
+        }
+        e.target.value = '';
+
+        // Add new task
+        const div = document.createElement('div');
+        div.classList.add('todo__task');
+
+        const taskEle = document.createElement('div');
+        taskEle.classList.add('todo__label');
+        taskEle.innerHTML = newTask;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = 'Remove';
+        removeBtn.classList.add('todo__button');
+        removeBtn.addEventListener('click', () => {
+            div.remove();
+        });
+
+        div.append(taskEle, removeBtn);
+        tasksEle.appendChild(div);
+    });
+});
+```
+</Playground>
+
+## Adding animation to new items
+
+Let's talk about how to make our todo app even better. We've already got the basics covered with creating and removing tasks, but let's take it up a notch and add some automatic animation to new tasks.
+
+To do this, we'll use a powerful API called `MutationObserver`. This API lets us track changes to the DOM, like when a new task is added, and then take action in response to those changes. It's a really handy tool for making our web app more dynamic and engaging.
+
+When we create a `MutationObserver` instance, we pass in a callback function that gets called whenever a change is detected. This function gets an array of `MutationRecord` objects as its first argument, which tells us what changed in the DOM.
+
+We also pass in an options object that specifies what changes we want to observe. For our todo app, we only care about additions or removals of child nodes from the tasks element. So we set the `childList` property to `true`, and the other properties to `false`.
+
+By using MutationObserver, we can easily detect and respond to changes in our app's UI without having to constantly check for updates.
+
+```js
+const tasksEle = document.getElementById('tasks');
+
+const mo = new MutationObserver(mutationCallback);
+mo.observe(tasksEle, {
+    attributes: false,
+    characterData: false,
+    childList: true,
+    subtree: false,
+});
+```
+
+This code creates a `MutationObserver` instance and passes it a callback function to monitor changes to a specific element (`tasksEle`). The `observe()` method is then called with the element and an options object to specify the types of mutations we want to observe (`childList`).
+
+The `mutationCallback` function is triggered by the `MutationObserver` instance whenever a change is detected in the observed element. It receives two arguments: an array of `MutationRecord` objects that describe the changes that occurred, and a reference to the `MutationObserver` instance.
+
+In our case, we only want to track changes to child nodes being added to the `tasks` element. To do this, we iterate over the `addedNodes` property of each `MutationRecord`, which contains a list of all the nodes that were added to the observed element as direct children.
+
+Here's how we implement the callback:
+
+```js
+const mutationCallback = (entries, instance) => {
+    entries.forEach((entry) => {
+        entry.addedNodes.forEach((newNode) => animateNewNode(newNode));
+    });
+};
+```
+
+To bring each new node into view, we use a separate function called `animateNewNode()`. This function is responsible for handling the animation process.
+
+```js
+const animateNewNode = (ele) => {
+    ele.style.overflow = "hidden";
+    ele.animate([
+        {
+            height: "0px",
+            opacity: 0,
+        },
+        {
+            height: `${ele.scrollHeight}px`,
+            opcity: 1,
+        },
+    ], {
+        duration: 400,
+    })
+    .addEventListener("finish", () => {
+        ele.style.overflow = "";
+    });
+};
+```
+
+The `animateNewNode()` function is in charge of animating the newly added task element, making it look smooth and visually pleasing. First, it sets the `overflow` property to `hidden` to prevent any content from overflowing during the animation.
+
+Next, it uses the `animate()` method to create a new animation. The animation transitions the element's `height` and `opacity` properties over a duration of 400 milliseconds. At first, the element is invisible with a height of 0 pixels and an opacity of 0. But as the animation progresses, the element becomes visible with a height equal to the element's scroll height and an opacity of 1.
+
+Finally, the function adds an event listener for the `finish` event on the animation object. This listener removes the `overflow` property from the element so that its content can overflow normally after the animation has finished.
+
+By calling this function for each new task added to our todo list, we can provide a smooth transition as tasks are added to the list.
+
+Try it out by entering a new task in the main input and pressing Enter. You'll see the new task slide in from the top to bottom automatically.
+
+<Playground>
+```css demo.css hidden
+body {
+    min-height: 24rem;
+}
+```
+
+```css styles.css
+.todo {
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+.todo__input {
+    align-items: center;
+    display: flex;
+
+    border: transparent;
+    height: 2rem;
+    outline: none;
+    padding: 0 1rem;
+    width: 100%;
+}
+.todo__task {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+
+    border-top: 1px solid rgb(203 213 225);
+    padding: 0 1rem;
+}
+.todo__label {
+    flex: 1;
+}
+.todo__button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    height: 2rem;
+    padding: 0 1rem;
+    text-decoration: underline;
+}
+```
+
+```html index.html
+<div class="todo">
+    <input class="todo__input" placeholder="Enter new task ..." type="text" id="newTask" />
+    <div id="tasks"></div>
+</div>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const newTaskInput = document.getElementById('newTask');
+    const tasksEle = document.getElementById('tasks');
+
+    newTaskInput.addEventListener('keydown', (e) => {
+        const newTask = e.target.value;
+        if (!newTask || e.key !== 'Enter') {
+            return;
+        }
+        e.target.value = '';
+
+        // Add new task
+        const div = document.createElement('div');
+        div.classList.add('todo__task');
+
+        const taskEle = document.createElement('div');
+        taskEle.classList.add('todo__label');
+        taskEle.innerHTML = newTask;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = 'Remove';
+        removeBtn.classList.add('todo__button');
+        removeBtn.addEventListener('click', () => {
+            div.remove();
+        });
+
+        div.append(taskEle, removeBtn);
+        tasksEle.appendChild(div);
+    });
+
+    const animateNewNode = (ele) => {
+        ele.style.overflow = 'hidden';
+        ele.animate([
+            {
+                height: '0px',
+                opacity: 0,
+            },
+            {
+                height: `${ele.scrollHeight}px`,
+                opcity: 1,
+            },
+        ], {
+            duration: 400,
+        }).addEventListener('finish', () => {
+            ele.style.overflow = '';
+        });
+    };
+
+    const mutationCallback = (entries, instance) => {
+        entries.forEach((entry) => {
+            entry.addedNodes.forEach((newNode) => animateNewNode(newNode));
+        });
+    };
+
+    const mo = new MutationObserver(mutationCallback)
+    mo.observe(tasksEle, {
+        attributes: false,
+        characterData: false,
+        childList: true,
+        subtree: false,
+    });
+});
+```
+</Playground>
+
+## Animating the removal of an item
+
+We'll take a similar approach to the previous section to animate the removal of items. In addition to added nodes, `MutationObserver` also provides access to removed nodes through the `removedNodes` property.
+
+```js
+const mutationCallback = (entries, instance) => {
+    entries.forEach((entry) => {
+        entry.removedNodes.forEach((removedNode) => {
+            animateRemovedNode(removedNode, entry.previousSibling, entry.nextSibling);
+        });
+    });
+};
+```
+
+If a node has been removed from a page, you may wonder how it can still be animated. The answer is simple: we can create a clone of the node using its instance, and insert it at the desired position. In this case, the `MutationRecord` provides the `previousSibling` and `nextSibling` properties, which are the previous and next siblings of the removed node.
+
+Within the `animateRemovedNode` function, we start by creating a clone of the removed node with its `cloneNode()` method. This creates a fresh copy of the node that we can then insert back into the DOM.
+
+```js
+const animateRemovedNode = (ele, previousSibling, nextSibling) => {
+    // Create a clone of the removed node
+    const clonedNode = ele.cloneNode(true);
+
+    // Insert the cloned node at the appropriate position
+    if (nextSibling && nextSibling.parentNode) {
+        nextSibling.parentNode.insertBefore(clonedNode, nextSibling);
+    } else if (previousSibling && previousSibling.parentNode) {
+        previousSibling.parentNode.appendChild(clonedNode);
+    }
+};
+```
+
+Now that we have our cloned node, we can use it to create our animation just like we did before. By inserting this cloned node back into the DOM, it appears to users that the original item is being animated out of view.
+
+Check out this sample code for an idea of how we animate the cloned node:
+
+```js
+clonedNode.style.transformOrigin = "center";
+clonedNode.style.overflow = "hidden";
+clonedNode.animate([
+    {
+        height: `${clonedNode.scrollHeight}px`,
+        opcity: 1,
+    },
+    {
+        height: "0px",
+        opacity: 0,
+    },
+], {
+    duration: 400,
+    easing: "linear",
+}).addEventListener("finish", () => {
+    clonedNode.style.overflow = "";
+    clonedNode.remove();
+});
+```
+
+To animate the clonedNode, we take a few steps. First, we set its `transformOrigin` property to `center` to ensure that the animation scales from the center of the element. We also set its `overflow` property to hidden so that its content doesn't overflow during the animation.
+
+Next, we use the `animate()` method to create a new animation that transitions the element's `height` and `opacity` properties over a duration of 400 milliseconds. The animation starts with a height equal to the clone's scroll height and an opacity of 1 (i.e., fully visible) and ends with a height of 0 pixels and an opacity of 0 (i.e., invisible).
+
+Finally, we add an event listener for the `finish` event on the animation object. This event is triggered when the animation has completed. In the event listener, we remove the `overflow` property from the element so that its content can overflow normally after the animation has finished, and then remove it from the DOM.
+
+## Differentiating the cloned node with added task elements
+
+When we clone a removed node and add it back to the task element, it will be treated as a new node and trigger the `animateNewNode()` function we created earlier. However, to avoid the cloned node from triggering the `animateNewNode()` function again, we can add a custom attribute to it.
+
+In this case, we'll call the attribute `DYNAMIC_NODE_ATTR`. Before animating a new node, we first check if it has this attribute. If it does, then we know that it's a cloned node and should not be animated again.
+
+Here's how we can use this attribute:
+
+```js
+const DYNAMIC_NODE_ATTR = 'data-dynamic-node';
+
+const animateNewNode = (ele) => {
+    if (ele.hasAttribute(DYNAMIC_NODE_ATTR)) {
+        return;
+    }
+    // Continue animating the new added item ...
+};
+
+const animateRemovedNode = (ele, previousSibling, nextSibling) => {
+    ele.setAttribute(DYNAMIC_NODE_ATTR, 'true');
+};
+```
+
+Now, whenever we add or remove a task from our todo list app, the animation runs smoothly without any issues. But, when we remove a task, we need to make sure that we don't trigger the `animateRemovedNode()` function again for the cloned node.
+
+To solve this issue, we can use a similar approach to what we did with the `animateNewNode()` function. We add a custom attribute to the cloned node called `BEING_REMOVED_ATTR`.
+
+Before animating a removed node, we check if it has this attribute. If it does, we know that it's a cloned node and should not be animated again. This is how we use the `BEING_REMOVED_ATTR` attribute.
+
+```javascript
+const BEING_REMOVED_ATTR = 'data-being-removed';
+
+const animateRemovedNode = (ele, previousSibling, nextSibling) => {
+    const clonedEle = ele.cloneNode(true);
+    if (clonedEle.hasAttribute(BEING_REMOVED_ATTR)) {
+        return;
+    }
+
+    clonedEle.setAttribute(BEING_REMOVED_ATTR, 'true');
+    // Continue animating the cloned item ...
+}
+```
+
+By checking for this attribute before animating a removed node, we ensure that only actual nodes being removed from our todo list are animated out of view.
+
+> **Tip**
+>
+> By using a custom attribute, we can solve our problems without having to use a custom data structure or additional variables to store added or removed items. This technique is incredibly useful and can be applied in many different situations.
+
+Let's check out the final result in the playground. You have the freedom to adjust the animations we created inside the `animateNewNode` and `animateRemovedNode` functions to suit your preferences.
+
+<Playground>
+```css demo.css hidden
+body {
+    min-height: 24rem;
+}
+```
+
+```css styles.css
+.todo {
+    border: 1px solid rgb(203 213 225);
+    border-radius: 0.25rem;
+    overflow: hidden;
+}
+.todo__input {
+    align-items: center;
+    display: flex;
+
+    border: transparent;
+    height: 2rem;
+    outline: none;
+    padding: 0 1rem;
+    width: 100%;
+}
+.todo__task {
+    align-items: center;
+    display: flex;
+    gap: 0.5rem;
+
+    border-top: 1px solid rgb(203 213 225);
+    padding: 0 1rem;
+}
+.todo__label {
+    flex: 1;
+}
+.todo__button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    height: 2rem;
+    padding: 0 1rem;
+    text-decoration: underline;
+}
+```
+
+```html index.html
+<div class="todo">
+    <input class="todo__input" placeholder="Enter new task ..." type="text" id="newTask" />
+    <div id="tasks"></div>
+</div>
+```
+
+```js scripts.js
+document.addEventListener('DOMContentLoaded', () => {
+    const newTaskInput = document.getElementById('newTask');
+    const tasksEle = document.getElementById('tasks');
+
+    const DYNAMIC_NODE_ATTR = 'data-dynamic-node';
+    const BEING_REMOVED_ATTR = 'data-being-removed';
+
+    newTaskInput.addEventListener('keydown', (e) => {
+        const newTask = e.target.value;
+        if (!newTask || e.key !== 'Enter') {
+            return;
+        }
+        e.target.value = '';
+
+        // Add new task
+        const div = document.createElement('div');
+        div.classList.add('todo__task');
+
+        const taskEle = document.createElement('div');
+        taskEle.classList.add('todo__label');
+        taskEle.innerHTML = newTask;
+
+        const removeBtn = document.createElement('button');
+        removeBtn.innerHTML = 'Remove';
+        removeBtn.classList.add('todo__button');
+        removeBtn.addEventListener('click', () => {
+            div.remove();
+        });
+
+        div.append(taskEle, removeBtn);
+        tasksEle.appendChild(div);
+    });
+
+    const animateNewNode = (ele) => {
+        if (ele.hasAttribute(DYNAMIC_NODE_ATTR)) {
+            return;
+        }
+        ele.style.overflow = 'hidden';
+        ele.animate([
+            {
+                height: '0px',
+                opacity: 0,
+            },
+            {
+                height: `${ele.scrollHeight}px`,
+                opcity: 1,
+            },
+        ], {
+            duration: 400,
+        }).addEventListener('finish', () => {
+            ele.style.overflow = '';
+        });
+    };
+
+    const animateRemovedNode = (ele, previousSibling, nextSibling) => {
+        const clonedEle = ele.cloneNode(true);
+        if (clonedEle.hasAttribute(BEING_REMOVED_ATTR)) {
+            return;
+        }
+        // Insert the removed ele
+        if (nextSibling && nextSibling.parentNode) {
+            nextSibling.parentNode.insertBefore(clonedEle, nextSibling)
+        } else if (previousSibling && previousSibling.parentNode) {
+            previousSibling.parentNode.appendChild(clonedEle)
+        }
+
+        clonedEle.setAttribute(DYNAMIC_NODE_ATTR, 'true');
+        clonedEle.setAttribute(BEING_REMOVED_ATTR, 'true');
+
+        // Needed for sliding in effect
+        clonedEle.style.transformOrigin = 'center';
+        clonedEle.style.overflow = 'hidden';
+        clonedEle.animate([
+            {
+                height: `${clonedEle.scrollHeight}px`,
+                opcity: 1,
+            },
+            {
+                height: '0px',
+                opacity: 0,
+            },
+        ], {
+            duration: 400,
+            easing: 'linear',
+        }).addEventListener('finish', () => {
+            clonedEle.style.overflow = '';
+            clonedEle.remove();
+        });
+    };
+
+    const mutationCallback = (entries, instance) => {
+        entries.forEach((entry) => {
+            entry.addedNodes.forEach((newNode) => {
+                animateNewNode(newNode);
+            });
+            entry.removedNodes.forEach((removedNode) => {
+                animateRemovedNode(removedNode, entry.previousSibling, entry.nextSibling);
+            });
+        });
+    };
+
+    const mo = new MutationObserver(mutationCallback)
+    mo.observe(tasksEle, {
+        attributes: false,
+        characterData: false,
+        childList: true,
+        subtree: false,
+    });
+});
+```
+</Playground>
+
+With this new addition to our code, we now have a fully functional todo app with smooth and visually appealing animations for adding and removing tasks.
+
+## Conclusion
+
+As we've seen, adding animations to our todo list app can greatly enhance the user experience. By animating the addition and removal of tasks, we give users a better sense of what's happening on the page and help them stay focused on their goals.
+
+In this post, we learned how to use `MutationObserver` to detect changes to our todo list and create animations for added and removed tasks. We also explored how to differentiate between newly added nodes and cloned nodes so that we can avoid running unnecessary animations.
+
+With these techniques in mind, you can add more advanced animations to your own web applications. But remember, animations should always be used in moderation and with purpose, as they can quickly become distracting or overwhelming if overused.
